@@ -8,6 +8,8 @@ interface Tetromino {
   x: number;
   y: number;
   color: string;
+  key: number;
+  rotation: number;
 }
 const cellSize = 24;
 const PREVIEW_COUNT = 4;
@@ -23,6 +25,122 @@ const tetrominoColors = [
   "#43aa8b",
   "#277da1",
 ];
+
+// Ref: https://tetris.fandom.com/wiki/SRS#Wall_Kicks
+const SRS = [
+  {
+    cw: [
+      [
+        [-2, 0],
+        [1, 0],
+        [-2, -1],
+        [1, 2],
+      ],
+      [
+        [-1, 0],
+        [2, 0],
+        [-1, 2],
+        [2, -1],
+      ],
+      [
+        [2, 0],
+        [-1, 0],
+        [2, 1],
+        [-1, -2],
+      ],
+      [
+        [1, 0],
+        [-2, 0],
+        [1, -2],
+        [-2, 1],
+      ],
+    ],
+    ccw: [
+      [
+        [2, 0],
+        [-1, 0],
+        [2, 1],
+        [-1, -2],
+      ],
+      [
+        [1, 0],
+        [-2, 0],
+        [1, -2],
+        [-2, 1],
+      ],
+      [
+        [-2, 0],
+        [1, 0],
+        [-2, -1],
+        [1, 2],
+      ],
+      [
+        [-1, 0],
+        [2, 0],
+        [-1, 2],
+        [2, -1],
+      ],
+    ],
+  }, // I
+  {
+    cw: [
+      [
+        [-1, 0],
+        [-1, 1],
+        [0, -2],
+        [-1, -2],
+      ],
+      [
+        [1, 0],
+        [1, -1],
+        [0, 2],
+        [1, 2],
+      ],
+      [
+        [1, 0],
+        [1, 1],
+        [0, -2],
+        [1, -2],
+      ],
+      [
+        [-1, 0],
+        [-1, -1],
+        [0, 2],
+        [-1, 2],
+      ],
+    ],
+    ccw: [
+      [
+        [1, 0],
+        [1, -1],
+        [0, 2],
+        [1, 2],
+      ],
+      [
+        [-1, 0],
+        [-1, 1],
+        [0, -2],
+        [-1, -2],
+      ],
+      [
+        [-1, 0],
+        [-1, -1],
+        [0, 2],
+        [-1, 2],
+      ],
+      [
+        [1, 0],
+        [1, 1],
+        [0, -2],
+        [1, -2],
+      ],
+    ],
+  }, // J, L, T, S, Z
+];
+
+function getSrsByIndex(key: number) {
+  return key === 0 ? SRS[0] : SRS[1];
+}
 
 const tetrominoShapes: number[][][] = [
   // I-shape
@@ -92,6 +210,8 @@ function generateTetromino(index: number): Tetromino {
     shape: randomShape,
     x: Math.floor((10 - randomShape.length) / 2),
     y: 0,
+    key: index,
+    rotation: 0,
     color: tetrominoColors[index],
   };
   return tetromino;
@@ -149,8 +269,10 @@ function moveTetromino(
   piece: Tetromino,
   mode: "right" | "left" | "rotateCw" | "rotateCcw" | "drop" | "hardDrop",
   map: number[][]
-): [Tetromino, boolean | undefined] {
+): [Tetromino, boolean | undefined, boolean | undefined] {
   let toSolidate = false;
+  let isKicked = false;
+
   switch (mode) {
     case "right": {
       const tempPiece = structuredClone(piece) as typeof piece;
@@ -158,9 +280,9 @@ function moveTetromino(
       tempPiece.y;
 
       if (!checkCollision(map, tempPiece)) {
-        return [tempPiece, toSolidate];
+        return [tempPiece, toSolidate, isKicked];
       }
-      return [piece, toSolidate];
+      return [piece, toSolidate, isKicked];
     }
     case "left": {
       const tempPiece = structuredClone(piece) as typeof piece;
@@ -168,19 +290,19 @@ function moveTetromino(
       tempPiece.y;
 
       if (!checkCollision(map, tempPiece)) {
-        return [tempPiece, toSolidate];
+        return [tempPiece, toSolidate, isKicked];
       }
-      return [piece, toSolidate];
+      return [piece, toSolidate, isKicked];
     }
     case "drop": {
       const tempPiece = structuredClone(piece) as typeof piece;
       tempPiece.y++;
 
       if (!checkCollision(map, tempPiece)) {
-        return [tempPiece, toSolidate];
+        return [tempPiece, toSolidate, isKicked];
       }
       toSolidate = true;
-      return [piece, toSolidate];
+      return [piece, toSolidate, isKicked];
     }
     case "hardDrop": {
       const tempPiece = structuredClone(piece) as typeof piece;
@@ -191,7 +313,7 @@ function moveTetromino(
       }
       tempPiece.y--;
       toSolidate = true;
-      return [tempPiece, toSolidate];
+      return [tempPiece, toSolidate, isKicked];
     }
     case "rotateCw": {
       const tempPiece = structuredClone(piece) as typeof piece;
@@ -206,15 +328,35 @@ function moveTetromino(
         }
       }
       tempPiece.shape = newShape;
+      tempPiece.rotation = (tempPiece.rotation + 1) % 4;
 
+      // SRS check
+      const {cw} = getSrsByIndex(tempPiece.key);
+
+      let rotatedResult = piece;
       if (!checkCollision(map, tempPiece)) {
-        return [tempPiece, toSolidate];
+        // If normal rotion works, use it
+        return [tempPiece, toSolidate, isKicked];
+      } else {
+        // Test for all SRS
+        for (let srs of cw[piece.rotation]) {
+          const tempPiece2 = structuredClone(tempPiece) as typeof piece;
+          const [dx, dy] = srs;
+          tempPiece2.x += dx;
+          tempPiece2.y -= dy;
+          if (!checkCollision(map, tempPiece2)) {
+            // One of the SRS works, so use this.
+            isKicked = true;
+            rotatedResult = tempPiece2;
+            break;
+          }
+        }
+        return [rotatedResult, toSolidate, isKicked];
       }
-      return [piece, toSolidate];
     }
 
     default:
-      return [piece, toSolidate];
+      return [piece, toSolidate, isKicked];
   }
 }
 
@@ -273,7 +415,7 @@ const useTetrisEngine = () => {
   const [tetromino, setTetromino] = useState(() => generateTetromino(seeds[0]));
   const [shadow, setShadow] = useState(tetromino);
 
-  const speed = (Date.now() - gameStartTimestamp.current) / 30_000;
+  const speed = 0.1 || (Date.now() - gameStartTimestamp.current) / 30_000;
 
   const resetMap = () => {
     setIsGameOver(false);
@@ -394,7 +536,7 @@ const useTetrisEngine = () => {
       } else {
         setTetromino(newTetromino);
       }
-    }, minMax(1000 / speed, 250, 1000) - now + timestampRef.current);
+    }, minMax(1000 / speed, 150, 1000) - now + timestampRef.current);
     return () => {
       clearInterval(intervalRef.current);
     };
