@@ -2,8 +2,8 @@ A practice on react rendering logic by creating a tetris games.
 
 ## Todo
 
-- [x] Tetrio shapes
+- [x] Tetromino shapes
 - [x] Level (? increase speed according to time passed since game start)
-- [ ] Tetrio rotation logic
+- [x] Tetromino rotation logic (SRS)
 - [ ] Scoring
 - [ ] WS compatible (For multiple-player)
