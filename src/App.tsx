@@ -363,11 +363,12 @@ function moveTetromino(
         .map(() => Array(size).fill(0));
       for (let y = 0; y < size; y++) {
         for (let x = 0; x < size; x++) {
-          newShape[x][y] = shape[size - 1 - y][x];
+          newShape[size - x - 1][y] = shape[y][x];
         }
       }
       tempPiece.shape = newShape;
-      tempPiece.rotation = (tempPiece.rotation + 1) % 4;
+      tempPiece.rotation =
+        tempPiece.rotation - 1 < 0 ? 3 : tempPiece.rotation - 1;
 
       // SRS check
       const {ccw} = getSrsByIndex(tempPiece.key);
@@ -626,7 +627,7 @@ function App() {
             e.currentTarget.blur();
           }}
         >
-          Reset Map
+          Clear Map
         </button>
         <button
           className="my-2 px-4 py-2 rounded bg-indigo-500 text-white text-sm"
@@ -635,7 +636,7 @@ function App() {
             e.currentTarget.blur();
           }}
         >
-          New piece
+          Regenerate Pieces
         </button>
       </div>
       <div className="flex gap-4 justify-center mx-auto">
