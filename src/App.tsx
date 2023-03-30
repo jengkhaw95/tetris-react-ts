@@ -485,6 +485,7 @@ const useTetrisEngine = () => {
     }
   };
 
+  // Ref: https://strategywiki.org/wiki/Tetris/Controls
   function keyboardControl(e: KeyboardEvent) {
     switch (e.key) {
       case "ArrowRight": {
@@ -497,8 +498,18 @@ const useTetrisEngine = () => {
         setTetromino(newTetromino);
         break;
       }
+      case "x":
+      case "X":
       case "ArrowUp": {
         const [newTetromino] = moveTetromino(tetromino, "rotateCw", map);
+        setTetromino(newTetromino);
+        break;
+      }
+      case "z":
+      case "Z":
+      case "Meta":
+      case "Control": {
+        const [newTetromino] = moveTetromino(tetromino, "rotateCcw", map);
         setTetromino(newTetromino);
         break;
       }
@@ -531,6 +542,8 @@ const useTetrisEngine = () => {
         }
         break;
       }
+      case "c":
+      case "C":
       case "Shift": {
         e.preventDefault();
         if (swap === null) {
