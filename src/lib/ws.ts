@@ -96,6 +96,13 @@ export const useWS = () => {
       }
     };
 
+    ws.current.onclose = () => {
+      if (!clientId) {
+        toast.error("Failed to join");
+        navigate("/");
+      }
+    };
+
     return () => {
       console.log("Connection Closed");
       //toast.error("Disconnected");
