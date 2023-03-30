@@ -354,6 +354,45 @@ function moveTetromino(
         return [rotatedResult, toSolidate, isKicked];
       }
     }
+    case "rotateCcw": {
+      const tempPiece = structuredClone(piece) as typeof piece;
+      const size = tempPiece.shape.length;
+      const shape = tempPiece.shape;
+      const newShape = Array(size)
+        .fill(0)
+        .map(() => Array(size).fill(0));
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          newShape[x][y] = shape[size - 1 - y][x];
+        }
+      }
+      tempPiece.shape = newShape;
+      tempPiece.rotation = (tempPiece.rotation + 1) % 4;
+
+      // SRS check
+      const {ccw} = getSrsByIndex(tempPiece.key);
+
+      let rotatedResult = piece;
+      if (!checkCollision(map, tempPiece)) {
+        // If normal rotion works, use it
+        return [tempPiece, toSolidate, isKicked];
+      } else {
+        // Test for all SRS
+        for (let srs of ccw[piece.rotation]) {
+          const tempPiece2 = structuredClone(tempPiece) as typeof piece;
+          const [dx, dy] = srs;
+          tempPiece2.x += dx;
+          tempPiece2.y -= dy;
+          if (!checkCollision(map, tempPiece2)) {
+            // One of the SRS works, so use this.
+            isKicked = true;
+            rotatedResult = tempPiece2;
+            break;
+          }
+        }
+        return [rotatedResult, toSolidate, isKicked];
+      }
+    }
 
     default:
       return [piece, toSolidate, isKicked];
