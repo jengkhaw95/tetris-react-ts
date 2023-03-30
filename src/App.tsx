@@ -263,7 +263,9 @@ function App() {
     <div className="w-screen min-h-screen overflow-x-hidden relative">
       <div className="fixed top-0 min-h-12 py-3 bg-white shadow w-full">
         <div className="container  px-12 mx-auto flex items-center justify-between">
-          <div>Tetris React TS</div>
+          <div className="text-lg font-extrabold uppercase text-transparent bg-clip-text bg-gradient-to-r from-[#E53935] to-[#FFA726]">
+            Tetris React TS
+          </div>
           <div className="flex items-center gap-3">
             <Link
               to="/room/1234"
