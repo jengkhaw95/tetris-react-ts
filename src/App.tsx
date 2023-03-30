@@ -1,10 +1,6 @@
-import { Link, Outlet } from "react-router-dom";
-import { Toaster } from 'react-hot-toast';
+import {Link, Outlet} from "react-router-dom";
+import {Toaster} from "react-hot-toast";
 // import "./App.css";
-
-
-
-
 
 // function minMax(value: number, min: number, max: number) {
 //   return Math.min(max, Math.max(value, min));
@@ -262,16 +258,25 @@ import { Toaster } from 'react-hot-toast';
 //   });
 // }
 
-
 function App() {
   return (
-    <div className="w-screen overflow-x-hidden">
+    <div className="w-screen min-h-screen overflow-x-hidden relative">
       <div className="fixed top-0 min-h-12 py-3 bg-white shadow w-full">
         <div className="container  px-12 mx-auto flex items-center justify-between">
           <div>Tetris React TS</div>
           <div className="flex items-center gap-3">
-            <Link to="/room/1234" className="text-sm rounded px-4 py-2 hover:bg-blue-100 text-blue-600">Invite</Link>
-            <Link to="/play" className="text-sm rounded px-4 py-2 text-white bg-blue-500">Play</Link>
+            <Link
+              to="/room/1234"
+              className="text-sm rounded px-4 py-2 hover:bg-blue-100 text-blue-600"
+            >
+              Invite
+            </Link>
+            <Link
+              to="/play"
+              className="text-sm rounded px-4 py-2 text-white bg-blue-500"
+            >
+              Play
+            </Link>
           </div>
         </div>
       </div>
@@ -282,6 +287,5 @@ function App() {
     </div>
   );
 }
-
 
 export default App;

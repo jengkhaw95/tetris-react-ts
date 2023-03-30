@@ -1,34 +1,36 @@
-import Tetromino from "../components/tetromino";
-import {
-  cellSize,
-  PREVIEW_COUNT,
-  tetrominoColors,
-  xCount,
-  yCount,
-} from "../lib/config";
-import {useTetrisEngine} from "../lib/engine";
+import React from "react";
+import {fakeCellSize, tetrominoColors, xCount, yCount} from "../lib/config";
+import {GameSnapshot, Tetromino} from "../types";
 
-export default function Home() {
-  const {map, tetromino, shadow, seeds, swap} = useTetrisEngine({});
-  return (
-    <div className="flex gap-4 justify-center mx-auto">
-      <div
-        className="flex items-center justify-center"
-        style={{
-          width: `${cellSize * 4}px`,
-          height: `${cellSize * 4}px`,
-        }}
-      >
-        {swap !== null ? <Tetromino index={swap} /> : null}
+export interface FakeGameBoardProps {
+  data: GameSnapshot | null;
+}
+
+export default function FakeGameBoard({data}: FakeGameBoardProps) {
+  if (!data) {
+    return (
+      <div>
+        <div
+          className="grid grid-cols-10 border"
+          style={{
+            width: `${fakeCellSize * xCount}px`,
+            height: `${fakeCellSize * yCount}px`,
+          }}
+        ></div>
       </div>
+    );
+  }
+  const {map, tetromino, shadow} = data;
+  return (
+    <div>
       <div
         className="grid grid-cols-10 border"
         style={{
-          width: `${cellSize * xCount}px`,
-          height: `${cellSize * yCount}px`,
+          width: `${fakeCellSize * xCount}px`,
+          height: `${fakeCellSize * yCount}px`,
         }}
       >
-        {map.map((m, y) =>
+        {data.map.map((m, y) =>
           m.map((n, x) => {
             const isTetrominoInRange =
               y - tetromino.y >= 0 &&
@@ -58,18 +60,13 @@ export default function Home() {
                       ? tetrominoColors[n - 1]
                       : "",
                   opacity: isShadow && !isTetromino ? ".35" : "",
-                  width: `${cellSize}px`,
-                  height: `${cellSize}px`,
+                  width: `${fakeCellSize}px`,
+                  height: `${fakeCellSize}px`,
                 }}
               ></div>
             );
           })
         )}
-      </div>
-      <div className="flex flex-col gap-4 items-center">
-        {seeds.slice(1, PREVIEW_COUNT + 1).map((s, i) => (
-          <Tetromino key={i} index={s} />
-        ))}
       </div>
     </div>
   );

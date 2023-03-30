@@ -1,4 +1,4 @@
-import Tetromino from "../components/tetromino";
+import React from "react";
 import {
   cellSize,
   PREVIEW_COUNT,
@@ -6,10 +6,22 @@ import {
   xCount,
   yCount,
 } from "../lib/config";
-import {useTetrisEngine} from "../lib/engine";
+import {TetrisEngineProps, useTetrisEngine} from "../lib/engine";
+import Tetromino from "./tetromino";
 
-export default function Home() {
-  const {map, tetromino, shadow, seeds, swap} = useTetrisEngine({});
+interface GameBoardProps extends TetrisEngineProps {}
+
+export default function Gameboard({
+  isPaused,
+  onGameOver,
+  onSnapshot,
+}: GameBoardProps) {
+  const {map, tetromino, shadow, seeds, swap} = useTetrisEngine({
+    isPaused,
+    onGameOver,
+    onSnapshot,
+  });
+
   return (
     <div className="flex gap-4 justify-center mx-auto">
       <div
