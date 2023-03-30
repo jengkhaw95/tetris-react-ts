@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react"
-import { useParams } from "react-router-dom";
-import { uuid } from "../../utils";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
 const WS_URL = "ws://localhost:3000"
 export const useWS = () => {
-
+    const navigate = useNavigate();
     const { roomId: roomIdParam } = useParams();
     const ws = useRef<WebSocket>();
     const [clientId, setClientId] = useState<string>("");
@@ -13,6 +12,8 @@ export const useWS = () => {
     const [totalPlayer, setTotalPlayer] = useState<number>(1);
     const [readyPlayers, setReadyPlayers] = useState<string[]>([]);
     const [leftPlayers, setLeftPlayers] = useState<string[]>([]);
+
+    const [gameStartTimestamp, setGameStartTimestamp] = useState<number>();
 
     const amIReady = readyPlayers.includes(clientId)
 
@@ -30,6 +31,7 @@ export const useWS = () => {
             switch (msg.type) {
                 case "REJECT": {
                     toast.error(`Failed to join room`);
+                    navigate("/");
                     break;
                 }
                 case "INIT": {
@@ -41,8 +43,14 @@ export const useWS = () => {
                     setReadyPlayers(readyPlayers);
                     break;
                 }
+                case "GAME_START": {
+                    toast("Starting game...");
+                    const { startTimestamp } = msg;
+                    setGameStartTimestamp(startTimestamp);
+                    break;
+                }
                 case "READY_STATE_CHANGE": {
-                    const { totalPlayer, readyPlayers } = msg;
+                    const { totalPlayer, readyPlayers, } = msg;
                     setTotalPlayer(totalPlayer);
                     setReadyPlayers(readyPlayers);
                     break;
@@ -72,6 +80,6 @@ export const useWS = () => {
         }
     }, [])
 
-    return { clientId, roomId, amIReady, totalPlayer, readyPlayers, sendToServer }
+    return { clientId, roomId, amIReady, totalPlayer, readyPlayers, sendToServer, gameStartTimestamp }
 
 }

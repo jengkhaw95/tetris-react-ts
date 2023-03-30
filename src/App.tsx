@@ -266,8 +266,8 @@ import { Toaster } from 'react-hot-toast';
 function App() {
   return (
     <div className="w-screen overflow-x-hidden">
-      <div className="fixed top-0 min-h-12 py-3 px-6 bg-white shadow w-full">
-        <div className="container mx-auto flex items-center justify-between">
+      <div className="fixed top-0 min-h-12 py-3 bg-white shadow w-full">
+        <div className="container  px-12 mx-auto flex items-center justify-between">
           <div>Tetris React TS</div>
           <div className="flex items-center gap-3">
             <Link to="/room/1234" className="text-sm rounded px-4 py-2 hover:bg-blue-100 text-blue-600">Invite</Link>
@@ -275,7 +275,7 @@ function App() {
           </div>
         </div>
       </div>
-      <div className="container mx-auto pt-20">
+      <div className="container px-12 mx-auto pt-20">
         <Outlet />
       </div>
       <Toaster />

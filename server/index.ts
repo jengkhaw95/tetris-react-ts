@@ -57,7 +57,7 @@ function sendInitRoomState(roomId: string, clientId: string) {
 
 }
 
-function broadcastRoomState(roomId: RoomIdType, eventType: "READY_STATE_CHANGE" | "PLAYER_JOIN" | "PLAYER_LEFT", skippingClientIds?: string | string[]) {
+function broadcastRoomState(roomId: RoomIdType, eventType: "READY_STATE_CHANGE" | "PLAYER_JOIN", skippingClientIds?: string | string[]) {
     // On Event
     // - PLAYER_JOIN
     // - PLAYER LEFT
@@ -159,11 +159,11 @@ wss.on('connection', (ws, req) => {
         console.log(`Received message: ${message}`);
 
         // Broadcast message to all clients
-        wss.clients.forEach((client) => {
-            if (client !== ws && client.readyState === WebSocket.OPEN) {
-                client.send(message);
-            }
-        });
+        // wss.clients.forEach((client) => {
+        //     if (client !== ws && client.readyState === WebSocket.OPEN) {
+        //         client.send(message);
+        //     }
+        // });
     });
 
     ws.on("open", (message: string) => {
@@ -181,7 +181,8 @@ wss.on('connection', (ws, req) => {
             if (gameRoom) {
                 broadcastToRoom(clientRoom, { type: "PLAYER_LEFT", playerId: clientId })
                 gameRoom.players.delete(clientId);
-                gameRoom.readyState.delete(clientId);
+                gameRoom.readyState.clear();
+                broadcastRoomState(clientRoom, "READY_STATE_CHANGE");
             }
         }
         clientRoomMap.delete(clientId);
