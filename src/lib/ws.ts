@@ -31,7 +31,7 @@ export const useWS = () => {
   };
 
   useEffect(() => {
-    console.log("INITIALING WS");
+    console.log("Initializing Websocket");
     ws.current = new WebSocket(`${WS_URL}?room=${roomIdParam}`);
     ws.current.onmessage = (e) => {
       const msg = JSON.parse(e.data);
@@ -97,8 +97,8 @@ export const useWS = () => {
     };
 
     return () => {
-      console.log("CLOSE");
-      toast.error("Disconnected");
+      console.log("Connection Closed");
+      //toast.error("Disconnected");
       ws.current?.close();
     };
   }, []);

@@ -24,7 +24,6 @@ export const useTetrisEngine = ({
   onSnapshot,
 }: TetrisEngineProps) => {
   const gameStartTimestamp = useRef<number>(Date.now());
-  const snapshotIntervalRef = useRef<NodeJS.Timer>();
   const intervalRef = useRef<NodeJS.Timer>();
   const lastY = useRef<number>();
   const timestampRef = useRef<number>(0);
@@ -60,9 +59,6 @@ export const useTetrisEngine = ({
     if (checkCollision(map, nextTetromino)) {
       setIsGameOver(true);
       onGameOver?.(Date.now());
-
-      //  resetMap();
-      //  regenerateTetromino();
     } else {
       setTetromino(nextTetromino);
     }
@@ -183,7 +179,7 @@ export const useTetrisEngine = ({
       } else {
         setTetromino(newTetromino);
       }
-    }, minMax(100 / speed, 15, 100) - now + timestampRef.current);
+    }, minMax(1000 / speed, 150, 1000) - now + timestampRef.current);
     return () => {
       clearInterval(intervalRef.current);
     };
