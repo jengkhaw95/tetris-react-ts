@@ -17,7 +17,7 @@ export default function Gameboard({
   onSnapshot,
   onLineClear,
 }: GameBoardProps) {
-  const {map, tetromino, shadow, seeds, swap} = useTetrisEngine({
+  const {map, tetromino, shadow, seeds, swap, combo} = useTetrisEngine({
     isPaused,
     onGameOver,
     onSnapshot,

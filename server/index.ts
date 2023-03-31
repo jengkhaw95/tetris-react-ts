@@ -235,10 +235,28 @@ wss.on("connection", (ws, req) => {
 
         break;
       }
+      case "ATTACK": {
+        const {roomId, clientId, target, lineCount} = msg;
+
+        const gs = gameState.get(roomId);
+        if (!gs) {
+          return;
+        }
+        gs.losers.push(clientId);
+        const targetWs = wsClients.get(target);
+        if (!targetWs) {
+          return;
+        }
+
+        ws.send(JSON.stringify({lineCount}));
+
+        break;
+      }
 
       default:
         break;
     }
+
     console.log(`Received message: ${message}`);
 
     // Broadcast message to all clients

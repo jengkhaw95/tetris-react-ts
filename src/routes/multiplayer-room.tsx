@@ -39,13 +39,12 @@ export default function MultiplayerRoom() {
     }
   };
 
-  // WIP
-  const handleComboCount = (timestamp: number, lineClear: number) => {
-    console.log(timestamp, lineClear);
-    let currentComboCount = 0;
-    currentComboCount += lineClear;
-
-    const toSend = comboCount(currentComboCount);
+  const handleComboCount = (
+    timestamp: number,
+    lineClear: number,
+    combo: number
+  ) => {
+    const toSend = comboCount(combo);
     sendToServer({type: "ATTACK", lineCount: toSend, target: "playerId"});
   };
 
@@ -64,6 +63,11 @@ export default function MultiplayerRoom() {
       clearInterval(timerRef.current);
     };
   }, [gameStartTimestamp]);
+
+  useEffect(() => {
+    if (isGameOver) {
+    }
+  }, [isGameOver]);
 
   return (
     <div className="flex flex-col items-center gap-12">

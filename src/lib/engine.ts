@@ -13,7 +13,7 @@ import {
 
 export interface TetrisEngineProps {
   isPaused?: boolean;
-  onLineClear?: (timestamp: number, lineCount: number) => void;
+  onLineClear?: (timestamp: number, lineCount: number, combo: number) => void;
   onGameOver?: (timestamp: number) => void;
   onSnapshot?: (snapshot: GameSnapshot) => void;
 }
@@ -34,6 +34,7 @@ export const useTetrisEngine = ({
   const [swap, setSwap] = useState<number | null>(null);
   const [tetromino, setTetromino] = useState(() => generateTetromino(seeds[0]));
   const [shadow, setShadow] = useState(tetromino);
+  const [combo, setCombo] = useState(-1);
 
   const speed = 0.1 || (Date.now() - gameStartTimestamp.current) / 30_000;
 
@@ -111,7 +112,10 @@ export const useTetrisEngine = ({
           const [newMap, lineClearCount] = solidate(newTetromino, map);
           setMap(newMap);
           if (lineClearCount) {
-            onLineClear?.(Date.now(), lineClearCount);
+            onLineClear?.(Date.now(), lineClearCount, combo + 1);
+            setCombo((c) => c + 1);
+          } else {
+            setCombo(-1);
           }
           nextTetromino();
         } else {
@@ -131,7 +135,10 @@ export const useTetrisEngine = ({
           const [newMap, lineClearCount] = solidate(newTetromino, map);
           setMap(newMap);
           if (lineClearCount) {
-            onLineClear?.(Date.now(), lineClearCount);
+            onLineClear?.(Date.now(), lineClearCount, combo + 1);
+            setCombo((c) => c + 1);
+          } else {
+            setCombo(-1);
           }
           nextTetromino();
         } else {
@@ -173,6 +180,7 @@ export const useTetrisEngine = ({
       return;
     }
     if (isGameOver) {
+      setCombo(-1);
       return;
     }
     const now = Date.now();
@@ -186,7 +194,10 @@ export const useTetrisEngine = ({
         const [newMap, lineClearCount] = solidate(newTetromino, map);
         setMap(newMap);
         if (lineClearCount) {
-          onLineClear?.(Date.now(), lineClearCount);
+          onLineClear?.(Date.now(), lineClearCount, combo + 1);
+          setCombo((c) => c + 1);
+        } else {
+          setCombo(-1);
         }
         nextTetromino();
       } else {
@@ -226,5 +237,6 @@ export const useTetrisEngine = ({
     shadow,
     seeds,
     swap,
+    combo,
   };
 };
