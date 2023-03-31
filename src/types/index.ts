@@ -11,4 +11,6 @@ export interface GameSnapshot {
   tetromino: Tetromino;
   shadow: Tetromino;
   swap: number | null;
+  seeds: number[];
+  pendingGarbageLineCount: number;
 }

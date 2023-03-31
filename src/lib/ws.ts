@@ -4,7 +4,7 @@ import {toast} from "react-hot-toast";
 import {GameSnapshot} from "../types";
 import {EngineConnectorType} from "./engine";
 
-const WS_URL = "ws://localhost:3000";
+const NEXT_PUBLIC_WS_URL = "ws://localhost:3000";
 
 export const useWS = ({
   engineConnector,
@@ -42,7 +42,7 @@ export const useWS = ({
 
   useEffect(() => {
     console.log("Initializing Websocket");
-    ws.current = new WebSocket(`${WS_URL}?room=${roomIdParam}`);
+    ws.current = new WebSocket(`${NEXT_PUBLIC_WS_URL}?room=${roomIdParam}`);
     ws.current.onmessage = (e) => {
       const msg = JSON.parse(e.data);
       switch (msg.type) {

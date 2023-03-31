@@ -1,5 +1,6 @@
 import {MutableRefObject, RefObject, useEffect, useRef, useState} from "react";
 import {GameSnapshot} from "../types";
+import {xCount} from "./config";
 import {
   checkCollision,
   generateSeeds,
@@ -16,16 +17,25 @@ export interface EngineConnectorType {
 }
 
 export interface TetrisEngineProps {
+  gameMode?: "default" | "multi";
   engineConnector?: React.MutableRefObject<EngineConnectorType | undefined>;
+  gameStartTimestamp?: number;
   isPaused?: boolean;
   isGameOver?: boolean;
-  onLineClear?: (timestamp: number, lineCount: number, combo: number) => void;
+  onLineClear?: (combo: number) => void;
   onGameOver?: (timestamp: number) => void;
   onSnapshot?: (snapshot: GameSnapshot) => void;
 }
 
+const generateGarbageLine = () => {
+  const r = Math.floor(Math.random() * xCount);
+  return Array.from(new Array(10), (_, i) => (i !== r ? -2 : 0));
+};
+
 export const useTetrisEngine = ({
+  gameMode,
   engineConnector,
+  gameStartTimestamp,
   isGameOver,
   isPaused,
   onGameOver,
@@ -33,7 +43,6 @@ export const useTetrisEngine = ({
   onLineClear,
 }: TetrisEngineProps) => {
   const garbageLineCount = useRef(0);
-  const gameStartTimestamp = useRef<number>(Date.now());
   const intervalRef = useRef<NodeJS.Timer>();
   const lastY = useRef<number>();
   const timestampRef = useRef<number>(0);
@@ -41,10 +50,20 @@ export const useTetrisEngine = ({
   const [map, setMap] = useState<number[][]>(() => makeNewMap());
   const [swap, setSwap] = useState<number | null>(null);
   const [tetromino, setTetromino] = useState(() => generateTetromino(seeds[0]));
-  const [shadow, setShadow] = useState(tetromino);
+  //const [shadow, setShadow] = useState(tetromino);
   const [combo, setCombo] = useState(-1);
 
-  const speed = 0.1 || (Date.now() - gameStartTimestamp.current) / 30_000;
+  const speed = 0.1 || (Date.now() - (gameStartTimestamp || 0)) / 30_000;
+
+  const shadow = getShadow(tetromino, map);
+
+  const restart = () => {
+    const newSeeds = generateSeeds(2);
+    setSeeds(newSeeds);
+    setMap(makeNewMap());
+    setSwap(null);
+    setTetromino(generateTetromino(newSeeds[0]));
+  };
 
   const nextTetromino = () => {
     if (isGameOver) {
@@ -119,7 +138,7 @@ export const useTetrisEngine = ({
             setMap([
               ...newMap.slice(garbageLineCount.current),
               ...Array.from(new Array(garbageLineCount.current), (_) =>
-                Array.from(new Array(10), (__) => -2)
+                generateGarbageLine()
               ),
             ]);
             garbageLineCount.current = 0;
@@ -127,7 +146,7 @@ export const useTetrisEngine = ({
             setMap(newMap);
           }
           if (lineClearCount) {
-            onLineClear?.(Date.now(), lineClearCount, combo + 1);
+            onLineClear?.(combo);
             setCombo((c) => c + 1);
           } else {
             setCombo(-1);
@@ -152,7 +171,7 @@ export const useTetrisEngine = ({
             setMap([
               ...newMap.slice(garbageLineCount.current),
               ...Array.from(new Array(garbageLineCount.current), (_) =>
-                Array.from(new Array(10), (__) => -2)
+                generateGarbageLine()
               ),
             ]);
             garbageLineCount.current = 0;
@@ -160,7 +179,7 @@ export const useTetrisEngine = ({
             setMap(newMap);
           }
           if (lineClearCount) {
-            onLineClear?.(Date.now(), lineClearCount, combo + 1);
+            onLineClear?.(combo);
             setCombo((c) => c + 1);
           } else {
             setCombo(-1);
@@ -198,11 +217,12 @@ export const useTetrisEngine = ({
     engineConnector.current = {appendGarbageLines};
   }
 
-  useEffect(() => {
-    setShadow(getShadow(tetromino, map));
-  }, [tetromino, map]);
+  //useEffect(() => {
+  //  setShadow(getShadow(tetromino, map));
+  //}, [tetromino, map]);
 
   useEffect(() => {
+    console.log({isPaused, isGameOver});
     if (isPaused) {
       clearInterval(intervalRef.current);
       return;
@@ -217,6 +237,8 @@ export const useTetrisEngine = ({
     }
     lastY.current = tetromino.y;
     intervalRef.current = setInterval(() => {
+      console.log("interval running");
+
       const [newTetromino, toSolidate] = moveTetromino(tetromino, "drop", map);
       if (toSolidate) {
         const [newMap, lineClearCount] = solidate(newTetromino, map);
@@ -224,7 +246,7 @@ export const useTetrisEngine = ({
           setMap([
             ...newMap.slice(garbageLineCount.current),
             ...Array.from(new Array(garbageLineCount.current), (_) =>
-              Array.from(new Array(10), (__) => -2)
+              generateGarbageLine()
             ),
           ]);
           garbageLineCount.current = 0;
@@ -232,7 +254,7 @@ export const useTetrisEngine = ({
           setMap(newMap);
         }
         if (lineClearCount) {
-          onLineClear?.(Date.now(), lineClearCount, combo + 1);
+          onLineClear?.(combo);
           setCombo((c) => c + 1);
         } else {
           setCombo(-1);
@@ -248,21 +270,28 @@ export const useTetrisEngine = ({
   }, [tetromino, isGameOver, isPaused]);
 
   useEffect(() => {
-    onSnapshot?.({map, tetromino, shadow, swap});
+    onSnapshot?.({
+      map,
+      tetromino,
+      shadow,
+      swap,
+      pendingGarbageLineCount: garbageLineCount.current,
+      seeds,
+    });
   }, [tetromino]);
 
-  useEffect(() => {
-    if (isGameOver) {
-      alert("GAMEOVER RESET");
-      const newSeeds = generateSeeds(2);
-      setSeeds(newSeeds);
-      setTetromino(generateTetromino(newSeeds[0]));
-      setMap(makeNewMap());
-      setCombo(-1);
-      clearInterval(intervalRef.current);
-      return;
-    }
-  }, [isGameOver]);
+  //useEffect(() => {
+  //  if (isGameOver) {
+  //    alert("GAMEOVER RESET");
+  //    const newSeeds = generateSeeds(2);
+  //    setSeeds(newSeeds);
+  //    setTetromino(generateTetromino(newSeeds[0]));
+  //    setMap(makeNewMap());
+  //    setCombo(-1);
+  //    clearInterval(intervalRef.current);
+  //    return;
+  //  }
+  //}, [isGameOver]);
 
   useEffect(() => {
     window.addEventListener("keydown", keyboardControl);
@@ -272,6 +301,7 @@ export const useTetrisEngine = ({
   }, [keyboardControl]);
 
   return {
+    gameMode: gameMode || "default",
     map,
     keyboardControl,
     tetromino,

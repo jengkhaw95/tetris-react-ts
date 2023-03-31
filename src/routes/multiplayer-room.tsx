@@ -46,11 +46,7 @@ export default function MultiplayerRoom() {
     }
   };
 
-  const handleComboCount = (
-    timestamp: number,
-    lineClear: number,
-    combo: number
-  ) => {
+  const handleComboCount = (combo: number) => {
     const toSend = comboCount(combo);
     console.log(targetingPool);
     if (targetingPool.length < 1) {
@@ -70,8 +66,9 @@ export default function MultiplayerRoom() {
   };
 
   const gameBoardData = useTetrisEngine({
+    gameMode: "multi",
     engineConnector: engineConnectorRef,
-    isPaused: countDown > 0 || isGameOver,
+    isPaused: !gameStartTimestamp || countDown > 0 || isGameOver,
     isGameOver: isGameOver,
     onGameOver: (timestamp) => sendToServer({type: "GAME_OVER", timestamp}),
     onSnapshot: handleSendSnapshot,
@@ -98,40 +95,35 @@ export default function MultiplayerRoom() {
     };
   }, [gameStartTimestamp]);
 
-  useEffect(() => {
-    if (isGameOver) {
-      // Show game over dialog
-    }
-  }, [isGameOver]);
-
   return (
-    <div className="flex flex-col items-center gap-12">
+    <div className="flex flex-col items-center gap-6">
       <div className="font-semibold text-slate-700 uppercase">
         Client ID: {clientId}
       </div>
-      {isGameOver ? "GAME OVER" : ""}
       {gameStartTimestamp ? (
         <div className="space-y-6">
           {countDown > 0 ? <div>Countdown: {countDown}</div> : null}
-          <Gameboard data={gameBoardData} />
-          <div className="flex items-center gap-6 justify-center">
-            {playerSnapshot.map(({snapshot, playerId}) => (
-              <FakeGameBoard
-                key={playerId}
-                data={snapshot}
-                hasLeft={leftPlayers.includes(playerId)}
-                hasLost={losers.includes(playerId)}
-              />
-            ))}
+          <div className="grid gap-2 grid-cols-2">
+            <Gameboard data={gameBoardData} />
+            <div className="flex items-center gap-6 justify-center">
+              {playerSnapshot.map(({snapshot, playerId}) => (
+                <FakeGameBoard
+                  key={playerId}
+                  data={snapshot}
+                  hasLeft={leftPlayers.includes(playerId)}
+                  hasLost={losers.includes(playerId)}
+                />
+              ))}
+            </div>
           </div>
         </div>
       ) : (
-        <>
+        <div className="flex flex-col items-center gap-6">
           <div className="flex items-center justify-center gap-3">
             {Array.from(new Array(MAX_PLAYER_PER_ROOM), (_, i) => (
               <IconUser
                 key={i}
-                className={` ${
+                className={`drop-shadow ${
                   i < readyPlayers.length
                     ? "text-teal-500"
                     : i < totalPlayer
@@ -161,7 +153,7 @@ export default function MultiplayerRoom() {
               ? "Cancel"
               : "Ready"}
           </button>
-        </>
+        </div>
       )}
     </div>
   );

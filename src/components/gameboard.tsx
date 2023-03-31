@@ -14,7 +14,16 @@ interface GameBoardProps {
 }
 
 export default function Gameboard({data}: GameBoardProps) {
-  const {map, tetromino, shadow, seeds, swap, combo, garbageLineCount} = data;
+  const {
+    gameMode,
+    map,
+    tetromino,
+    shadow,
+    seeds,
+    swap,
+    combo,
+    garbageLineCount,
+  } = data;
 
   return (
     <div className="flex gap-4 justify-center mx-auto">
@@ -28,14 +37,24 @@ export default function Gameboard({data}: GameBoardProps) {
         {swap !== null ? <Tetromino index={swap} /> : null}
       </div>
       <div
-        className="relative grid grid-cols-10 border"
-        style={{
-          width: `${cellSize * xCount}px`,
-          height: `${cellSize * yCount}px`,
-        }}
+        className="relative grid grid-cols-10 border gap-px"
+        //style={{
+        //  width: `${cellSize * xCount}px`,
+        //  height: `${cellSize * yCount}px`,
+        //}}
       >
         <>
-          <div className="absolute w-2 rounded-full h-full -left-4 border"></div>
+          {gameMode === "multi" ? (
+            <div className="absolute w-2 rounded-full h-full -left-4 border overflow-hidden flex items-end">
+              <div
+                className="relative w-full bg-blue-100 rounded bg-gradient-to-t from-[#FFA726] to-[#E53935] transition-all"
+                style={{
+                  height: `${(garbageLineCount.current / yCount) * 100}%`,
+                }}
+              ></div>
+            </div>
+          ) : null}
+          <GameboardOverlay />
           {map.map((m, y) =>
             m.map((n, x) => {
               const isTetrominoInRange =
@@ -83,5 +102,11 @@ export default function Gameboard({data}: GameBoardProps) {
         ))}
       </div>
     </div>
+  );
+}
+
+function GameboardOverlay() {
+  return (
+    <div className="absolute z-10 w-full h-full flex items-center justify-center"></div>
   );
 }

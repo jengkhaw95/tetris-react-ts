@@ -262,7 +262,7 @@ import {uuid} from "../utils";
 function App() {
   const navigate = useNavigate();
   return (
-    <div className="w-screen min-h-screen overflow-x-hidden relative">
+    <div className="w-screen min-h-screen relative">
       <div className="fixed top-0 min-h-12 py-3 bg-white shadow w-full">
         <div className="container  px-12 mx-auto flex items-center justify-between">
           <Link
