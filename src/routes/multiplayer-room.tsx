@@ -17,6 +17,7 @@ export default function MultiplayerRoom() {
     sendToServer,
     amIReady,
     clientId,
+    roomId,
     totalPlayer,
     readyPlayers,
     gameStartTimestamp,
@@ -97,8 +98,9 @@ export default function MultiplayerRoom() {
 
   return (
     <div className="flex flex-col items-center gap-6">
-      <div className="font-semibold text-slate-700 uppercase">
-        Client ID: {clientId}
+      <div className="font-semibold text-slate-700 uppercase space-y-3 ">
+        <div>Client ID: {clientId}</div>
+        <div>Room ID: {roomId}</div>
       </div>
       {gameStartTimestamp ? (
         <div className="space-y-6">

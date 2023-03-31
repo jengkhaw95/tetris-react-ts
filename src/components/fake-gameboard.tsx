@@ -1,15 +1,12 @@
 import React from "react";
 import {
   cellSize,
-  fakeCellSize,
   PREVIEW_COUNT,
   tetrominoColors,
   xCount,
   yCount,
 } from "../lib/config";
 import {GameSnapshot} from "../types";
-import IconDisconnect from "./icons/disconnect";
-import IconSad from "./icons/sad";
 import Tetromino from "./tetromino";
 
 export interface FakeGameBoardProps {
@@ -24,8 +21,6 @@ export default function FakeGameBoard({
   data,
   size,
   gameMode,
-  hasLeft,
-  hasLost,
 }: FakeGameBoardProps) {
   size = size || cellSize;
   gameMode = gameMode || "default";

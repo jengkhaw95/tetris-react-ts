@@ -107,7 +107,7 @@ wss.on("connection", (ws, req) => {
     return;
   }
   const url = new URL(req.url, `http://${req.headers.host}`);
-  const roomId = url.searchParams.get("room");
+  const roomId = url.searchParams.get("room")?.toLowerCase();
   const clientId = uuid();
 
   if (!roomId) {
