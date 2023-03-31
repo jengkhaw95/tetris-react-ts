@@ -8,9 +8,9 @@ A practice on react rendering logic by creating a tetris games.
 - [x] WS server/client (For multiple-player)
 - [x] Scoring/Combo calculation
 - [x] UI on garbage gauge
+- [x] Multiplayer statring countdown display
 - [ ] UI on combo
 - [ ] Multiplayer UI Layout
-- [ ] Multiplayer statring countdown display
 - [ ] Custom username
 - [ ] Snapshot on start
 
