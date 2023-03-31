@@ -1,5 +1,9 @@
 import Gameboard from "../components/gameboard";
+import {useTetrisEngine} from "../lib/engine";
 
 export default function Home() {
-  return <Gameboard isPaused={true} />;
+  const gameBoardData = useTetrisEngine({
+    isPaused: true,
+  });
+  return <Gameboard data={gameBoardData} />;
 }

@@ -7,10 +7,12 @@ import {
   MAX_PLAYER_PER_ROOM,
   MIN_SNAPSHOT_INTERVAL,
 } from "../lib/config";
+import {EngineConnectorType, useTetrisEngine} from "../lib/engine";
 import {useWS} from "../lib/ws";
 import {GameSnapshot} from "../types";
 
 export default function MultiplayerRoom() {
+  const engineConnectorRef = useRef<EngineConnectorType>();
   const {
     sendToServer,
     amIReady,
@@ -22,11 +24,16 @@ export default function MultiplayerRoom() {
     isGameOver,
     leftPlayers,
     losers,
-  } = useWS();
+  } = useWS({engineConnector: engineConnectorRef});
 
   const timerRef = useRef<NodeJS.Timer>();
   const lastSnapshotTimstamp = useRef<number>(0);
   const [countDown, setCountDown] = useState<number>(0);
+
+  const targetingPool = playerSnapshot.filter(
+    (p) => !losers.includes(p.playerId) && p.playerId !== clientId
+  );
+  const targetingPlayerIndex = Math.abs(countDown) % targetingPool.length;
 
   const handleSendSnapshot = (snapshot: GameSnapshot) => {
     const n = Date.now();
@@ -45,16 +52,43 @@ export default function MultiplayerRoom() {
     combo: number
   ) => {
     const toSend = comboCount(combo);
-    sendToServer({type: "ATTACK", lineCount: toSend, target: "playerId"});
+    console.log(targetingPool);
+    if (targetingPool.length < 1) {
+      return;
+    }
+    const targetingPlayerId = targetingPool[targetingPlayerIndex]?.playerId;
+    if (!targetingPlayerId) {
+      console.log(targetingPlayerIndex, targetingPool);
+      return;
+    }
+    console.log(`Attacking ${combo}`);
+    sendToServer({
+      type: "ATTACK",
+      lineCount: toSend + 1,
+      target: targetingPlayerId,
+    });
   };
 
+  const gameBoardData = useTetrisEngine({
+    engineConnector: engineConnectorRef,
+    isPaused: countDown > 0 || isGameOver,
+    isGameOver: isGameOver,
+    onGameOver: (timestamp) => sendToServer({type: "GAME_OVER", timestamp}),
+    onSnapshot: handleSendSnapshot,
+    onLineClear: handleComboCount,
+  });
+
   useEffect(() => {
-    if (gameStartTimestamp) {
+    if (isGameOver) {
+      clearInterval(timerRef.current);
+      setCountDown(0);
+    } else if (gameStartTimestamp) {
       timerRef.current = setInterval(() => {
         const tts = gameStartTimestamp - Date.now();
-        if (tts < 0) {
-          clearInterval(timerRef.current);
-        }
+        // Prevent stoping just to re-use count to target attacking player
+        //if (tts < 0) {
+        //  clearInterval(timerRef.current);
+        //}
         setCountDown(Math.ceil(tts / 1000));
       }, 100);
     }
@@ -66,6 +100,7 @@ export default function MultiplayerRoom() {
 
   useEffect(() => {
     if (isGameOver) {
+      // Show game over dialog
     }
   }, [isGameOver]);
 
@@ -74,17 +109,11 @@ export default function MultiplayerRoom() {
       <div className="font-semibold text-slate-700 uppercase">
         Client ID: {clientId}
       </div>
+      {isGameOver ? "GAME OVER" : ""}
       {gameStartTimestamp ? (
         <div className="space-y-6">
           {countDown > 0 ? <div>Countdown: {countDown}</div> : null}
-          <Gameboard
-            isPaused={countDown > 0 || isGameOver}
-            onGameOver={(timestamp) =>
-              sendToServer({type: "GAME_OVER", timestamp})
-            }
-            onSnapshot={handleSendSnapshot}
-            onLineClear={handleComboCount}
-          />
+          <Gameboard data={gameBoardData} />
           <div className="flex items-center gap-6 justify-center">
             {playerSnapshot.map(({snapshot, playerId}) => (
               <FakeGameBoard

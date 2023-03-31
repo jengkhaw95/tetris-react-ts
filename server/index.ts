@@ -237,7 +237,7 @@ wss.on("connection", (ws, req) => {
       }
       case "ATTACK": {
         const {roomId, clientId, target, lineCount} = msg;
-
+        console.log(`Player ${clientId} attacking ${target} with ${lineCount}`);
         const gs = gameState.get(roomId);
         if (!gs) {
           return;
@@ -248,7 +248,13 @@ wss.on("connection", (ws, req) => {
           return;
         }
 
-        ws.send(JSON.stringify({lineCount}));
+        targetWs.send(
+          JSON.stringify({
+            type: "ATTACKED",
+            lineCount,
+            playerId: clientId,
+          })
+        );
 
         break;
       }
@@ -257,7 +263,7 @@ wss.on("connection", (ws, req) => {
         break;
     }
 
-    console.log(`Received message: ${message}`);
+    //console.log(`Received message: ${message}`);
 
     // Broadcast message to all clients
     // wss.clients.forEach((client) => {

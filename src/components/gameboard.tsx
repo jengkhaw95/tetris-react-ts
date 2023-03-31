@@ -6,26 +6,19 @@ import {
   xCount,
   yCount,
 } from "../lib/config";
-import {TetrisEngineProps, useTetrisEngine} from "../lib/engine";
+import {useTetrisEngine} from "../lib/engine";
 import Tetromino from "./tetromino";
 
-interface GameBoardProps extends TetrisEngineProps {}
+interface GameBoardProps {
+  data: Omit<ReturnType<typeof useTetrisEngine>, "handleMapChange">;
+}
 
-export default function Gameboard({
-  isPaused,
-  onGameOver,
-  onSnapshot,
-  onLineClear,
-}: GameBoardProps) {
-  const {map, tetromino, shadow, seeds, swap, combo} = useTetrisEngine({
-    isPaused,
-    onGameOver,
-    onSnapshot,
-    onLineClear,
-  });
+export default function Gameboard({data}: GameBoardProps) {
+  const {map, tetromino, shadow, seeds, swap, combo, garbageLineCount} = data;
 
   return (
     <div className="flex gap-4 justify-center mx-auto">
+      Garbage Line: {garbageLineCount.current}
       <div
         className="flex items-center justify-center"
         style={{
@@ -70,6 +63,8 @@ export default function Gameboard({
                       ? tetromino.color
                       : n > 0
                       ? tetrominoColors[n - 1]
+                      : n === -2
+                      ? "#ccc"
                       : "",
                   opacity: isShadow && !isTetromino ? ".35" : "",
                   width: `${cellSize}px`,

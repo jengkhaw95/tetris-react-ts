@@ -2,15 +2,20 @@ import {useEffect, useRef, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {toast} from "react-hot-toast";
 import {GameSnapshot} from "../types";
+import {EngineConnectorType} from "./engine";
 
 const WS_URL = "ws://localhost:3000";
 
-export const useWS = () => {
+export const useWS = ({
+  engineConnector,
+}: {
+  engineConnector: React.MutableRefObject<EngineConnectorType | undefined>;
+}) => {
   const navigate = useNavigate();
   const {roomId: roomIdParam} = useParams();
   const ws = useRef<WebSocket>();
   const [clientId, setClientId] = useState<string>("");
-  const [roomId, setRoomId] = useState();
+  const [roomId, setRoomId] = useState("");
   const [totalPlayer, setTotalPlayer] = useState<number>(1);
   const [readyPlayers, setReadyPlayers] = useState<string[]>([]);
   const [leftPlayers, setLeftPlayers] = useState<string[]>([]);
@@ -24,6 +29,10 @@ export const useWS = () => {
 
   const isGameOver = !!winner;
   const amIReady = readyPlayers.includes(clientId);
+
+  //const setEngineConnector = (connector: () => void) => {
+  //  engineConnectorRef.current = connector;
+  //};
 
   const sendToServer = (payload: any) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
@@ -65,6 +74,14 @@ export const useWS = () => {
           } else {
             toast("Game Over");
           }
+
+          //setReadyPlayers([]);
+          //setGameStartTimestamp(undefined);
+          //setLeftPlayers([]);
+          //setClientId("");
+          //setRoomId("");
+          //setLosers([]);
+          //setPlayerSnapshot([]);
           ws.current?.close();
           break;
         }
@@ -94,7 +111,13 @@ export const useWS = () => {
           setPlayerSnapshot((s) =>
             s.map((n) => (n.playerId === playerId ? {...n, snapshot} : n))
           );
-
+          break;
+        }
+        case "ATTACKED": {
+          const {playerId, lineCount} = msg;
+          engineConnector.current?.appendGarbageLines(lineCount);
+          toast.error(lineCount, playerId);
+          console.log(engineConnector.current);
           break;
         }
         default:
