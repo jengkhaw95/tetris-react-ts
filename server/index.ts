@@ -248,6 +248,10 @@ wss.on("connection", (ws, req) => {
           return;
         }
 
+        if (!lineCount) {
+          return;
+        }
+
         targetWs.send(
           JSON.stringify({
             type: "ATTACKED",

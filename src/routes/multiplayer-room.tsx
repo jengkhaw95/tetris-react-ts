@@ -61,7 +61,7 @@ export default function MultiplayerRoom() {
     console.log(`Attacking ${combo}`);
     sendToServer({
       type: "ATTACK",
-      lineCount: toSend + 1,
+      lineCount: toSend,
       target: targetingPlayerId,
     });
   };
@@ -104,12 +104,12 @@ export default function MultiplayerRoom() {
       </div>
       {gameStartTimestamp ? (
         <div className="space-y-6">
-          {countDown > 0 ? <div>Countdown: {countDown}</div> : null}
           <div className="grid gap-2 grid-cols-2">
-            <Gameboard data={gameBoardData} />
+            <Gameboard data={gameBoardData} timer={countDown} />
             <div className="flex items-center gap-6 justify-center">
               {playerSnapshot.map(({snapshot, playerId}) => (
                 <FakeGameBoard
+                  timer={countDown}
                   key={playerId}
                   data={snapshot}
                   hasLeft={leftPlayers.includes(playerId)}

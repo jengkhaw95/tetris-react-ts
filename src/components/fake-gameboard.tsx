@@ -7,6 +7,7 @@ import {
   yCount,
 } from "../lib/config";
 import {GameSnapshot} from "../types";
+import {GameboardOverlay} from "./gameboard";
 import Tetromino from "./tetromino";
 
 export interface FakeGameBoardProps {
@@ -15,12 +16,14 @@ export interface FakeGameBoardProps {
   gameMode?: "default" | "multi";
   hasLeft?: boolean;
   hasLost?: boolean;
+  timer?: number;
 }
 
 export default function FakeGameBoard({
   data,
   size,
   gameMode,
+  timer,
 }: FakeGameBoardProps) {
   size = size || cellSize;
   gameMode = gameMode || "default";
@@ -65,7 +68,13 @@ export default function FakeGameBoard({
               ></div>
             </div>
           ) : null}
-          {/*<GameboardOverlay />*/}
+          <GameboardOverlay>
+            {timer && timer > 0 ? (
+              <div className="text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#E53935] to-[#FFA726]">
+                {timer}
+              </div>
+            ) : null}
+          </GameboardOverlay>
           {map.map((m, y) =>
             m.map((n, x) => {
               const isTetrominoInRange =

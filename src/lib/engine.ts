@@ -222,7 +222,6 @@ export const useTetrisEngine = ({
   //}, [tetromino, map]);
 
   useEffect(() => {
-    console.log({isPaused, isGameOver});
     if (isPaused) {
       clearInterval(intervalRef.current);
       return;
@@ -278,7 +277,7 @@ export const useTetrisEngine = ({
       pendingGarbageLineCount: garbageLineCount.current,
       seeds,
     });
-  }, [tetromino]);
+  }, [tetromino, isPaused]);
 
   //useEffect(() => {
   //  if (isGameOver) {

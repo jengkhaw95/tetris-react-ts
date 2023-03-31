@@ -12,6 +12,7 @@ A practice on react rendering logic by creating a tetris games.
 - [ ] Multiplayer UI Layout
 - [ ] Multiplayer statring countdown display
 - [ ] Custom username
+- [ ] Snapshot on start
 
 - [ ] End game when all others have left.
 - [ ] Set timers to manually end the game on server.

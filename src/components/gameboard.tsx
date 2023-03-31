@@ -1,4 +1,4 @@
-import React from "react";
+import React, {PropsWithChildren} from "react";
 import {
   cellSize,
   PREVIEW_COUNT,
@@ -11,9 +11,10 @@ import Tetromino from "./tetromino";
 
 interface GameBoardProps {
   data: Omit<ReturnType<typeof useTetrisEngine>, "handleMapChange">;
+  timer?: number;
 }
 
-export default function Gameboard({data}: GameBoardProps) {
+export default function Gameboard({data, timer}: GameBoardProps) {
   const {
     gameMode,
     map,
@@ -54,7 +55,13 @@ export default function Gameboard({data}: GameBoardProps) {
               ></div>
             </div>
           ) : null}
-          <GameboardOverlay />
+          <GameboardOverlay>
+            {timer && timer > 0 ? (
+              <div className="text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#E53935] to-[#FFA726]">
+                {timer}
+              </div>
+            ) : null}
+          </GameboardOverlay>
           {map.map((m, y) =>
             m.map((n, x) => {
               const isTetrominoInRange =
@@ -105,8 +112,12 @@ export default function Gameboard({data}: GameBoardProps) {
   );
 }
 
-function GameboardOverlay() {
+interface GameboardOverlayProps extends PropsWithChildren {}
+
+export function GameboardOverlay({children}: GameboardOverlayProps) {
   return (
-    <div className="absolute z-10 w-full h-full flex items-center justify-center"></div>
+    <div className="absolute z-10 w-full h-full flex items-center justify-center">
+      {children}
+    </div>
   );
 }
