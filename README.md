@@ -9,10 +9,12 @@ A practice on react rendering logic by creating a tetris games.
 - [x] Scoring/Combo calculation
 - [x] UI on garbage gauge
 - [x] Multiplayer statring countdown display
+- [x] Snapshot on start
 - [ ] UI on combo
 - [ ] Multiplayer UI Layout
 - [ ] Custom username
-- [ ] Snapshot on start
+
+- [ ] Keep track of line clear per sec, max combo, total line clear
 
 - [ ] End game when all others have left.
 - [ ] Set timers to manually end the game on server.
