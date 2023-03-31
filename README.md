@@ -7,3 +7,6 @@ A practice on react rendering logic by creating a tetris games.
 - [x] Tetromino rotation logic (SRS)
 - [x] WS server/client (For multiple-player)
 - [ ] Scoring/Combo calculation
+
+- [ ] End game when all others have left.
+- [ ] Set timers to manually end the game.

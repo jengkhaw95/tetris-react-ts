@@ -1,12 +1,20 @@
 import React from "react";
 import {fakeCellSize, tetrominoColors, xCount, yCount} from "../lib/config";
 import {GameSnapshot, Tetromino} from "../types";
+import IconDisconnect from "./icons/disconnect";
+import IconSad from "./icons/sad";
 
 export interface FakeGameBoardProps {
   data: GameSnapshot | null;
+  hasLeft?: boolean;
+  hasLost?: boolean;
 }
 
-export default function FakeGameBoard({data}: FakeGameBoardProps) {
+export default function FakeGameBoard({
+  data,
+  hasLeft,
+  hasLost,
+}: FakeGameBoardProps) {
   if (!data) {
     return (
       <div>
@@ -22,9 +30,20 @@ export default function FakeGameBoard({data}: FakeGameBoardProps) {
   }
   const {map, tetromino, shadow} = data;
   return (
-    <div>
+    <div className="relative">
+      {hasLeft || hasLost ? (
+        <div className="z-10 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          {hasLeft ? (
+            <IconDisconnect className="text-slate-700" size={32} />
+          ) : hasLost ? (
+            <IconSad className="text-slate-700" size={32} />
+          ) : null}
+        </div>
+      ) : null}
       <div
-        className="grid grid-cols-10 border"
+        className={`grid grid-cols-10 border ${
+          hasLeft || hasLost ? "bg-slate-100 blur-[2px] opacity-80" : ""
+        }`}
         style={{
           width: `${fakeCellSize * xCount}px`,
           height: `${fakeCellSize * yCount}px`,

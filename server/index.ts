@@ -215,9 +215,15 @@ wss.on("connection", (ws, req) => {
           return;
         }
         gs.losers.push(clientId);
+
+        broadcastRoomState(roomId, "READY_STATE_CHANGE");
+
+        // Check if game ends
         if (gs.losers.length >= gs.players.size - 1) {
           gs.winner = clientId;
           broadcastRoomState(roomId, "GAME_END");
+
+          // Clean up room
           [...gs.players].forEach((playerId) => {
             wsClients.get(playerId)?.close();
             clientRoomMap.delete(playerId);
@@ -226,7 +232,6 @@ wss.on("connection", (ws, req) => {
           // Close room
           return;
         }
-        broadcastRoomState(roomId, "READY_STATE_CHANGE");
 
         break;
       }
@@ -260,6 +265,11 @@ wss.on("connection", (ws, req) => {
         gameRoom.players.delete(clientId);
         gameRoom.readyState.clear();
         broadcastRoomState(clientRoom, "READY_STATE_CHANGE");
+
+        // Clean room when all players left
+        if (!gameRoom.players.size) {
+          gameState.delete(clientRoom);
+        }
       }
     }
     clientRoomMap.delete(clientId);

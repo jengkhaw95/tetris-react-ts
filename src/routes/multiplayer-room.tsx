@@ -2,7 +2,11 @@ import {useEffect, useRef, useState} from "react";
 import FakeGameBoard from "../components/fake-gameboard";
 import Gameboard from "../components/gameboard";
 import IconUser from "../components/icons/user";
-import {MAX_PLAYER_PER_ROOM, MIN_SNAPSHOT_INTERVAL} from "../lib/config";
+import {
+  comboCount,
+  MAX_PLAYER_PER_ROOM,
+  MIN_SNAPSHOT_INTERVAL,
+} from "../lib/config";
 import {useWS} from "../lib/ws";
 import {GameSnapshot} from "../types";
 
@@ -16,6 +20,8 @@ export default function MultiplayerRoom() {
     gameStartTimestamp,
     playerSnapshot,
     isGameOver,
+    leftPlayers,
+    losers,
   } = useWS();
 
   const timerRef = useRef<NodeJS.Timer>();
@@ -31,6 +37,16 @@ export default function MultiplayerRoom() {
     } else {
       console.log(`Blocked snapshot sending: ${interval}ms`);
     }
+  };
+
+  // WIP
+  const handleComboCount = (timestamp: number, lineClear: number) => {
+    console.log(timestamp, lineClear);
+    let currentComboCount = 0;
+    currentComboCount += lineClear;
+
+    const toSend = comboCount(currentComboCount);
+    sendToServer({type: "ATTACK", lineCount: toSend, target: "playerId"});
   };
 
   useEffect(() => {
@@ -63,10 +79,16 @@ export default function MultiplayerRoom() {
               sendToServer({type: "GAME_OVER", timestamp})
             }
             onSnapshot={handleSendSnapshot}
+            onLineClear={handleComboCount}
           />
           <div className="flex items-center gap-6 justify-center">
             {playerSnapshot.map(({snapshot, playerId}) => (
-              <FakeGameBoard key={playerId} data={snapshot} />
+              <FakeGameBoard
+                key={playerId}
+                data={snapshot}
+                hasLeft={leftPlayers.includes(playerId)}
+                hasLost={losers.includes(playerId)}
+              />
             ))}
           </div>
         </div>

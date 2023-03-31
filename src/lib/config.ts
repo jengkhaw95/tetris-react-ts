@@ -1,3 +1,5 @@
+import {minMax} from "./utils";
+
 export const cellSize = 24;
 export const fakeCellSize = 12;
 export const PREVIEW_COUNT = 4;
@@ -183,3 +185,8 @@ export const tetrominoShapes: number[][][] = [
     [0, 0, 0],
   ],
 ];
+
+// Ref: https://tetris.wiki/Combo
+export const comboCount = (currentCombo: number) => {
+  return minMax(Math.ceil(currentCombo / 2), 0, 4);
+};

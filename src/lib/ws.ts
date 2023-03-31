@@ -14,6 +14,7 @@ export const useWS = () => {
   const [totalPlayer, setTotalPlayer] = useState<number>(1);
   const [readyPlayers, setReadyPlayers] = useState<string[]>([]);
   const [leftPlayers, setLeftPlayers] = useState<string[]>([]);
+  const [losers, setLosers] = useState<string[]>([]);
   const [playerSnapshot, setPlayerSnapshot] = useState<
     {playerId: string; snapshot: GameSnapshot | null}[]
   >([]);
@@ -57,16 +58,21 @@ export const useWS = () => {
           break;
         }
         case "GAME_END": {
-          toast("Game Over");
           const {winner} = msg;
           setWinner(winner);
+          if (winner === clientId) {
+            toast("You won!");
+          } else {
+            toast("Game Over");
+          }
           ws.current?.close();
           break;
         }
         case "READY_STATE_CHANGE": {
-          const {totalPlayer, readyPlayers} = msg;
+          const {totalPlayer, readyPlayers, losers} = msg;
           setTotalPlayer(totalPlayer);
           setReadyPlayers(readyPlayers);
+          setLosers(losers);
           break;
         }
         case "PLAYER_JOIN": {
@@ -97,10 +103,10 @@ export const useWS = () => {
     };
 
     ws.current.onclose = () => {
-      if (!clientId) {
-        toast.error("Failed to join");
-        navigate("/");
-      }
+      //if (!clientId) {
+      //  toast.error("Failed to join");
+      //  navigate("/");
+      //}
     };
 
     return () => {
@@ -129,6 +135,8 @@ export const useWS = () => {
     sendToServer,
     playerSnapshot,
     isGameOver,
+    leftPlayers,
+    losers,
     gameStartTimestamp,
   };
 };

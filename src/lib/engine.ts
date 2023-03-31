@@ -13,7 +13,7 @@ import {
 
 export interface TetrisEngineProps {
   isPaused?: boolean;
-  onClearLines?: () => void;
+  onLineClear?: (timestamp: number, lineCount: number) => void;
   onGameOver?: (timestamp: number) => void;
   onSnapshot?: (snapshot: GameSnapshot) => void;
 }
@@ -22,6 +22,7 @@ export const useTetrisEngine = ({
   isPaused,
   onGameOver,
   onSnapshot,
+  onLineClear,
 }: TetrisEngineProps) => {
   const gameStartTimestamp = useRef<number>(Date.now());
   const intervalRef = useRef<NodeJS.Timer>();
@@ -107,7 +108,11 @@ export const useTetrisEngine = ({
           map
         );
         if (toSolidate) {
-          setMap(solidate(newTetromino, map));
+          const [newMap, lineClearCount] = solidate(newTetromino, map);
+          setMap(newMap);
+          if (lineClearCount) {
+            onLineClear?.(Date.now(), lineClearCount);
+          }
           nextTetromino();
         } else {
           setTetromino(newTetromino);
@@ -123,7 +128,11 @@ export const useTetrisEngine = ({
           map
         );
         if (toSolidate) {
-          setMap(solidate(newTetromino, map));
+          const [newMap, lineClearCount] = solidate(newTetromino, map);
+          setMap(newMap);
+          if (lineClearCount) {
+            onLineClear?.(Date.now(), lineClearCount);
+          }
           nextTetromino();
         } else {
           setTetromino(newTetromino);
@@ -174,7 +183,11 @@ export const useTetrisEngine = ({
     intervalRef.current = setInterval(() => {
       const [newTetromino, toSolidate] = moveTetromino(tetromino, "drop", map);
       if (toSolidate) {
-        setMap(solidate(newTetromino, map));
+        const [newMap, lineClearCount] = solidate(newTetromino, map);
+        setMap(newMap);
+        if (lineClearCount) {
+          onLineClear?.(Date.now(), lineClearCount);
+        }
         nextTetromino();
       } else {
         setTetromino(newTetromino);

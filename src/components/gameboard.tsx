@@ -15,11 +15,13 @@ export default function Gameboard({
   isPaused,
   onGameOver,
   onSnapshot,
+  onLineClear,
 }: GameBoardProps) {
   const {map, tetromino, shadow, seeds, swap} = useTetrisEngine({
     isPaused,
     onGameOver,
     onSnapshot,
+    onLineClear,
   });
 
   return (
