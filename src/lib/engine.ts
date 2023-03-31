@@ -47,6 +47,9 @@ export const useTetrisEngine = ({
   const speed = 0.1 || (Date.now() - gameStartTimestamp.current) / 30_000;
 
   const nextTetromino = () => {
+    if (isGameOver) {
+      return;
+    }
     setSeeds((s) => {
       const [_, ...k] = s;
       if (k.length <= 8) {
@@ -56,7 +59,6 @@ export const useTetrisEngine = ({
     });
     const nextTetromino = generateTetromino(seeds[1]);
     if (checkCollision(map, nextTetromino)) {
-      console.log("GAMEOVER TO SERVER");
       onGameOver?.(Date.now());
     } else {
       setTetromino(nextTetromino);
@@ -202,6 +204,10 @@ export const useTetrisEngine = ({
 
   useEffect(() => {
     if (isPaused) {
+      clearInterval(intervalRef.current);
+      return;
+    }
+    if (isGameOver) {
       clearInterval(intervalRef.current);
       return;
     }

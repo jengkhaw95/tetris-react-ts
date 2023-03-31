@@ -6,7 +6,9 @@ A practice on react rendering logic by creating a tetris games.
 - [x] Level (? increase speed according to time passed since game start)
 - [x] Tetromino rotation logic (SRS)
 - [x] WS server/client (For multiple-player)
-- [ ] Scoring/Combo calculation
+- [x] Scoring/Combo calculation
+- [ ] UI on garbage gauge
+- [ ] UI on combo
 
 - [ ] End game when all others have left.
-- [ ] Set timers to manually end the game.
+- [ ] Set timers to manually end the game on server.
