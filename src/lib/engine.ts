@@ -236,7 +236,7 @@ export const useTetrisEngine = ({
     }
     lastY.current = tetromino.y;
     intervalRef.current = setInterval(() => {
-      console.log("interval running");
+      //console.log("interval running");
 
       const [newTetromino, toSolidate] = moveTetromino(tetromino, "drop", map);
       if (toSolidate) {

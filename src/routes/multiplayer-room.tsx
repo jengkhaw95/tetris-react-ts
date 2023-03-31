@@ -49,13 +49,11 @@ export default function MultiplayerRoom() {
 
   const handleComboCount = (combo: number) => {
     const toSend = comboCount(combo);
-    console.log(targetingPool);
     if (targetingPool.length < 1) {
       return;
     }
     const targetingPlayerId = targetingPool[targetingPlayerIndex]?.playerId;
     if (!targetingPlayerId) {
-      console.log(targetingPlayerIndex, targetingPool);
       return;
     }
     console.log(`Attacking ${combo}`);

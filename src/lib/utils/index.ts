@@ -243,7 +243,7 @@ export function solidate(
   for (let j in newMap) {
     let c = 0;
     for (let i of newMap[j]) {
-      if (i > 0) {
+      if (i !== 0) {
         c++;
       }
       if (c === 10) {
