@@ -3,7 +3,7 @@ import FakeGameBoard from "../components/fake-gameboard";
 import Gameboard from "../components/gameboard";
 import IconUser from "../components/icons/user";
 import {
-  comboCount,
+  calculateGarbageLineCountByCombo,
   MAX_PLAYER_PER_ROOM,
   MIN_SNAPSHOT_INTERVAL,
 } from "../lib/config";
@@ -36,7 +36,7 @@ export default function MultiplayerRoom() {
   );
   const targetingPlayerIndex = Math.abs(countDown) % targetingPool.length;
 
-  const handleSendSnapshot = (snapshot: GameSnapshot) => {
+  const handleSendSnapshotToServer = (snapshot: GameSnapshot) => {
     const n = Date.now();
     const interval = n - lastSnapshotTimstamp.current;
     if (interval > MIN_SNAPSHOT_INTERVAL) {
@@ -48,7 +48,7 @@ export default function MultiplayerRoom() {
   };
 
   const handleComboCount = (combo: number) => {
-    const toSend = comboCount(combo);
+    const toSend = calculateGarbageLineCountByCombo(combo);
     if (targetingPool.length < 1) {
       return;
     }
@@ -70,10 +70,11 @@ export default function MultiplayerRoom() {
     isPaused: !gameStartTimestamp || countDown > 0 || isGameOver,
     isGameOver: isGameOver,
     onGameOver: (timestamp) => sendToServer({type: "GAME_OVER", timestamp}),
-    onSnapshot: handleSendSnapshot,
+    onSnapshot: handleSendSnapshotToServer,
     onLineClear: handleComboCount,
   });
 
+  // Start counting down when all players are ready (gameStartTimestamp is set)
   useEffect(() => {
     if (isGameOver) {
       clearInterval(timerRef.current);
@@ -118,43 +119,72 @@ export default function MultiplayerRoom() {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-6">
-          <div className="flex items-center justify-center gap-3">
-            {Array.from(new Array(MAX_PLAYER_PER_ROOM), (_, i) => (
-              <IconUser
-                key={i}
-                className={`drop-shadow ${
-                  i < readyPlayers.length
-                    ? "text-teal-500"
-                    : i < totalPlayer
-                    ? "text-slate-500"
-                    : "text-slate-300"
-                }`}
-                size={40}
-              />
-            ))}
-          </div>
-
-          <button
-            className={`rounded text-sm text-white px-4 py-2 disabled:bg-gray-200 ${
-              amIReady ? "bg-red-500" : "bg-teal-500"
-            }`}
-            disabled={!!gameStartTimestamp || totalPlayer <= 1}
-            onClick={() => {
-              if (gameStartTimestamp || totalPlayer <= 1) {
-                return;
-              }
-              sendToServer({type: "READY_STATE_CHANGE", isReady: !amIReady});
-            }}
-          >
-            {gameStartTimestamp
-              ? "Game is starting..."
-              : amIReady
-              ? "Cancel"
-              : "Ready"}
-          </button>
-        </div>
+        <WaitingZone
+          gameStartTimestamp={gameStartTimestamp}
+          onReadyStateChanged={sendToServer}
+          readyPlayers={readyPlayers}
+          totalPlayer={totalPlayer}
+          amIReady={amIReady}
+        />
       )}
+    </div>
+  );
+}
+
+interface WaitingZoneProps {
+  totalPlayer: number;
+  readyPlayers: string[];
+  amIReady?: boolean;
+  gameStartTimestamp?: number;
+  onReadyStateChanged: (data: {
+    type: "READY_STATE_CHANGE";
+    isReady: boolean;
+  }) => void;
+}
+
+function WaitingZone({
+  totalPlayer,
+  readyPlayers,
+  amIReady,
+  gameStartTimestamp,
+  onReadyStateChanged,
+}: WaitingZoneProps) {
+  return (
+    <div className="flex flex-col items-center gap-6">
+      <div className="flex items-center justify-center gap-3">
+        {Array.from(new Array(MAX_PLAYER_PER_ROOM), (_, i) => (
+          <IconUser
+            key={i}
+            className={`drop-shadow ${
+              i < readyPlayers.length
+                ? "text-teal-500"
+                : i < totalPlayer
+                ? "text-slate-500"
+                : "text-slate-300"
+            }`}
+            size={40}
+          />
+        ))}
+      </div>
+
+      <button
+        className={`rounded text-sm text-white px-4 py-2 disabled:bg-gray-200 ${
+          amIReady ? "bg-red-500" : "bg-teal-500"
+        }`}
+        disabled={!!gameStartTimestamp || totalPlayer <= 1}
+        onClick={() => {
+          if (gameStartTimestamp || totalPlayer <= 1) {
+            return;
+          }
+          onReadyStateChanged({type: "READY_STATE_CHANGE", isReady: !amIReady});
+        }}
+      >
+        {gameStartTimestamp
+          ? "Game is starting..."
+          : amIReady
+          ? "Cancel"
+          : "Ready"}
+      </button>
     </div>
   );
 }

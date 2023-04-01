@@ -3,13 +3,6 @@ import WebSocket from "ws";
 import {uuid} from "../utils";
 import {MAX_PLAYER_PER_ROOM} from "../src/lib/config";
 
-const app = express();
-const server = app.listen(3000, () => {
-  console.log("Server started on port 3000");
-});
-
-const wss = new WebSocket.Server({server});
-
 type ClientIdType = string;
 
 type RoomIdType = string;
@@ -22,6 +15,14 @@ interface GameState {
   winner?: ClientIdType;
   isGameOver: false;
 }
+
+const app = express();
+
+const server = app.listen(3000, () => {
+  console.log("Server started on port 3000");
+});
+
+const wss = new WebSocket.Server({server});
 
 const wsClients: Map<ClientIdType, WebSocket> = new Map();
 const clientRoomMap: Map<ClientIdType, RoomIdType> = new Map();
@@ -73,7 +74,6 @@ function sendInitRoomState(roomId: string, clientId: string) {
       isGameOver: gs.isGameOver,
     })
   );
-  // broadcastToRoom(roomId, { type: eventType, totalPlayer: gameState.get(roomId)!.players.size, readyPlayers: [...gameState.get(roomId)!.readyState], startTimestamp: gs.startTimestamp, isGameOver: gs.isGameOver })
 }
 
 function broadcastRoomState(
@@ -266,15 +266,6 @@ wss.on("connection", (ws, req) => {
       default:
         break;
     }
-
-    //console.log(`Received message: ${message}`);
-
-    // Broadcast message to all clients
-    // wss.clients.forEach((client) => {
-    //     if (client !== ws && client.readyState === WebSocket.OPEN) {
-    //         client.send(message);
-    //     }
-    // });
   });
 
   ws.on("open", (message: string) => {

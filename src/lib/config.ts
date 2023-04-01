@@ -187,6 +187,6 @@ export const tetrominoShapes: number[][][] = [
 ];
 
 // Ref: https://tetris.wiki/Combo
-export const comboCount = (currentCombo: number) => {
+export const calculateGarbageLineCountByCombo = (currentCombo: number) => {
   return minMax(Math.ceil(currentCombo / 2), 0, 4);
 };

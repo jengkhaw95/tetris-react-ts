@@ -4,7 +4,7 @@ import {toast} from "react-hot-toast";
 import {GameSnapshot} from "../types";
 import {EngineConnectorType} from "./engine";
 
-const NEXT_PUBLIC_WS_URL = "ws://localhost:3000";
+const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:3000";
 
 export const useWS = ({
   engineConnector,
@@ -30,10 +30,6 @@ export const useWS = ({
   const isGameOver = !!winner;
   const amIReady = readyPlayers.includes(clientId);
 
-  //const setEngineConnector = (connector: () => void) => {
-  //  engineConnectorRef.current = connector;
-  //};
-
   const sendToServer = (payload: any) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current?.send(JSON.stringify({...payload, clientId, roomId}));
@@ -42,7 +38,7 @@ export const useWS = ({
 
   useEffect(() => {
     console.log("Initializing Websocket");
-    ws.current = new WebSocket(`${NEXT_PUBLIC_WS_URL}?room=${roomIdParam}`);
+    ws.current = new WebSocket(`${WS_URL}?room=${roomIdParam}`);
     ws.current.onmessage = (e) => {
       const msg = JSON.parse(e.data);
       switch (msg.type) {
@@ -75,13 +71,6 @@ export const useWS = ({
             toast("Game Over");
           }
 
-          //setReadyPlayers([]);
-          //setGameStartTimestamp(undefined);
-          //setLeftPlayers([]);
-          //setClientId("");
-          //setRoomId("");
-          //setLosers([]);
-          //setPlayerSnapshot([]);
           ws.current?.close();
           break;
         }
@@ -134,7 +123,6 @@ export const useWS = ({
 
     return () => {
       console.log("Connection Closed");
-      //toast.error("Disconnected");
       ws.current?.close();
     };
   }, []);
