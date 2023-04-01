@@ -10,7 +10,8 @@
     "nodemon": "nodemon server/index.ts",
     "typecheck": "tsc",
     "format-check": "prettier --check \"(src|utils|server)/**/*.{ts,tsx}\"",
-    "format": "prettier --write \"(src|utils|server)/**/*.{ts,tsx}\""
+    "format": "prettier --write \"(src|utils|server)/**/*.{ts,tsx}\"",
+    "prepare": "husky install"
   },
   "dependencies": {
     "express": "^4.18.2",
