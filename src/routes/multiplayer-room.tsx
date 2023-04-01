@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
+import { toast } from 'react-hot-toast'
 import FakeGameBoard from '../components/fake-gameboard'
 import Gameboard from '../components/gameboard'
+import IconCopy from '../components/icons/copy'
 import IconUser from '../components/icons/user'
 import {
   calculateGarbageLineCountByCombo,
@@ -74,6 +76,8 @@ export default function MultiplayerRoom() {
     onLineClear: handleComboCount,
   })
 
+  const copyUrl = `${window.location.protocol}//${window.location.host}/room/${roomId}`
+
   // Start counting down when all players are ready (gameStartTimestamp is set)
   useEffect(() => {
     if (isGameOver) {
@@ -97,10 +101,25 @@ export default function MultiplayerRoom() {
 
   return (
     <div className="flex flex-col items-center gap-6">
-      <div className="font-semibold text-slate-700 uppercase space-y-3 ">
+      <div className="flex items-center font-semibold text-slate-700 uppercase gap-12">
         <div>Client ID: {clientId}</div>
         <div>Room ID: {roomId}</div>
       </div>
+      {gameStartTimestamp ? null : (
+        <button
+          className="flex items-center gap-2 px-2 py-1 text-xs font-semibold rounded bg-slate-100 w-max hover:text-white group hover:bg-gradient-to-r hover:from-[#E53935] hover:to-[#FFA726] hover:shadow"
+          onClick={() => {
+            navigator.clipboard.writeText(copyUrl)
+            toast.success('Copied to clipboard')
+          }}
+        >
+          <IconCopy
+            size={16}
+            className="text-slate-700 group-hover:text-white"
+          />
+          <div>Invite link</div>
+        </button>
+      )}
       {gameStartTimestamp ? (
         <div className="space-y-6">
           <div className="grid gap-2 grid-cols-2">

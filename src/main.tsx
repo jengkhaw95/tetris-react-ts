@@ -6,6 +6,7 @@ import './index.css'
 import Home from './routes/home'
 import MultiplayerRoom from './routes/multiplayer-room'
 import Play from './routes/play'
+import Test from './routes/test'
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
       {
         path: '/room/:roomId',
         element: <MultiplayerRoom />,
+      },
+      {
+        path: '/test',
+        element: <Test />,
       },
     ],
   },

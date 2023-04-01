@@ -57,6 +57,20 @@ export const useTetrisEngine = ({
 
   const shadow = getShadow(tetromino, map)
 
+  const reRoll = () => {
+    if (gameMode === 'test') {
+      const newSeeds = generateSeeds(2)
+      setSwap(null)
+      setSeeds(newSeeds)
+      setTetromino(generateTetromino(newSeeds[0]))
+    }
+  }
+  const clearMap = () => {
+    if (gameMode === 'test') {
+      setMap(makeNewMap())
+    }
+  }
+
   const customDrawMap = (x: number, y: number) => {
     if (gameMode === 'test') {
       setMap((_map) =>
@@ -214,9 +228,7 @@ export const useTetrisEngine = ({
       case 'v':
       case 'V': {
         if (gameMode === 'test') {
-          const newSeeds = generateSeeds(2)
-          setSeeds(newSeeds)
-          setTetromino(generateTetromino(newSeeds[0]))
+          reRoll()
         }
         break
       }
@@ -323,5 +335,7 @@ export const useTetrisEngine = ({
     combo,
     garbageLineCount,
     customDrawMap,
+    reRoll,
+    clearMap,
   }
 }
