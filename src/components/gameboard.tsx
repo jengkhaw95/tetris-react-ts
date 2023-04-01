@@ -20,6 +20,7 @@ export default function Gameboard({ data, timer }: GameBoardProps) {
     swap,
     combo,
     garbageLineCount,
+    customDrawMap,
   } = data
 
   return (
@@ -60,6 +61,7 @@ export default function Gameboard({ data, timer }: GameBoardProps) {
                   width: `${cellSize}px`,
                   height: `${cellSize}px`,
                 }}
+                onClick={() => customDrawMap(x, y)}
               ></div>
             )
           })
@@ -84,7 +86,7 @@ interface GameboardOverlayProps extends PropsWithChildren {}
 
 export function GameboardOverlay({ children }: GameboardOverlayProps) {
   return (
-    <div className="absolute z-10 w-full h-full flex items-center justify-center">
+    <div className="absolute pointer-events-none z-10 w-full h-full flex items-center justify-center">
       {children}
     </div>
   )

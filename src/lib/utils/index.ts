@@ -170,7 +170,7 @@ export function moveTetromino(
           const tempPiece2 = structuredClone(tempPiece) as typeof piece
           const [dx, dy] = srs
           tempPiece2.x += dx
-          tempPiece2.y -= dy
+          tempPiece2.y += dy
           if (!checkCollision(map, tempPiece2)) {
             // One of the SRS works, so use this.
             isKicked = true
@@ -210,7 +210,7 @@ export function moveTetromino(
           const tempPiece2 = structuredClone(tempPiece) as typeof piece
           const [dx, dy] = srs
           tempPiece2.x += dx
-          tempPiece2.y -= dy
+          tempPiece2.y += dy
           if (!checkCollision(map, tempPiece2)) {
             // One of the SRS works, so use this.
             isKicked = true

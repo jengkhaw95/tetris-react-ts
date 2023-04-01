@@ -17,7 +17,7 @@ export interface EngineConnectorType {
 }
 
 export interface TetrisEngineProps {
-  gameMode?: 'default' | 'multi'
+  gameMode?: 'default' | 'multi' | 'test'
   engineConnector?: React.MutableRefObject<EngineConnectorType | undefined>
   gameStartTimestamp?: number
   isPaused?: boolean
@@ -57,6 +57,14 @@ export const useTetrisEngine = ({
 
   const shadow = getShadow(tetromino, map)
 
+  const customDrawMap = (x: number, y: number) => {
+    if (gameMode === 'test') {
+      setMap((_map) =>
+        _map.map((m, j) => m.map((n, i) => (i === x && j === y ? -2 : n)))
+      )
+    }
+  }
+
   const restart = () => {
     const newSeeds = generateSeeds(2)
     setSeeds(newSeeds)
@@ -92,7 +100,7 @@ export const useTetrisEngine = ({
 
   // Ref: https://strategywiki.org/wiki/Tetris/Controls
   function keyboardControl(e: KeyboardEvent) {
-    if (isPaused || isGameOver) {
+    if (gameMode !== 'test' && (isPaused || isGameOver)) {
       return
     }
     switch (e.key) {
@@ -203,6 +211,15 @@ export const useTetrisEngine = ({
           setTetromino(generateTetromino(swap))
         }
       }
+      case 'v':
+      case 'V': {
+        if (gameMode === 'test') {
+          const newSeeds = generateSeeds(2)
+          setSeeds(newSeeds)
+          setTetromino(generateTetromino(newSeeds[0]))
+        }
+        break
+      }
 
       default:
         break
@@ -218,7 +235,7 @@ export const useTetrisEngine = ({
   //}, [tetromino, map]);
 
   useEffect(() => {
-    if (isPaused) {
+    if (isPaused || gameMode === 'test') {
       clearInterval(intervalRef.current)
       return
     }
@@ -305,5 +322,6 @@ export const useTetrisEngine = ({
     swap,
     combo,
     garbageLineCount,
+    customDrawMap,
   }
 }
