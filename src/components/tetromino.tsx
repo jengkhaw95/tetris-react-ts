@@ -5,11 +5,24 @@ export default function Tetromino({
   index,
   size,
 }: {
-  index: number
+  index: number | null
   size?: number
 }) {
-  const tetromino = generateTetromino(index)
   size = size || cellSize
+  if (index === null) {
+    return (
+      <div
+        className="flex items-center justify-center"
+        style={{
+          width: `${size * 4}px`,
+          height: `${size * 4}px`,
+        }}
+      ></div>
+    )
+  }
+
+  const tetromino = generateTetromino(index)
+
   return (
     <div
       className="flex items-center justify-center"
