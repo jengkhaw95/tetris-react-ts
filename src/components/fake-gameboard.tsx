@@ -1,23 +1,18 @@
-import React from "react";
-import {
-  cellSize,
-  tetrominoColors,
-  xCount,
-  yCount,
-} from "../lib/config";
-import {GameSnapshot} from "../types";
-import {GameboardOverlay} from "./gameboard";
-import GarbageGauge from "./garbage-gauge";
-import SwapPiece from "./swap-piece";
-import UpcomingPieces from "./upcoming-pieces";
+import React from 'react'
+import { cellSize, tetrominoColors, xCount, yCount } from '../lib/config'
+import { GameSnapshot } from '../types'
+import { GameboardOverlay } from './gameboard'
+import GarbageGauge from './garbage-gauge'
+import SwapPiece from './swap-piece'
+import UpcomingPieces from './upcoming-pieces'
 
 export interface FakeGameBoardProps {
-  data: GameSnapshot | null;
-  size?: number;
-  gameMode?: "default" | "multi";
-  hasLeft?: boolean;
-  hasLost?: boolean;
-  timer?: number;
+  data: GameSnapshot | null
+  size?: number
+  gameMode?: 'default' | 'multi'
+  hasLeft?: boolean
+  hasLost?: boolean
+  timer?: number
 }
 
 export default function FakeGameBoard({
@@ -26,8 +21,8 @@ export default function FakeGameBoard({
   gameMode,
   timer,
 }: FakeGameBoardProps) {
-  size = size || cellSize;
-  gameMode = gameMode || "default";
+  size = size || cellSize
+  gameMode = gameMode || 'default'
   if (!data) {
     return (
       <div>
@@ -39,9 +34,9 @@ export default function FakeGameBoard({
           }}
         ></div>
       </div>
-    );
+    )
   }
-  const {map, tetromino, shadow, swap, pendingGarbageLineCount, seeds} = data;
+  const { map, tetromino, shadow, swap, pendingGarbageLineCount, seeds } = data
   return (
     <div className="flex gap-4 justify-center mx-auto">
       <SwapPiece index={swap} />
@@ -52,18 +47,17 @@ export default function FakeGameBoard({
               y - tetromino.y >= 0 &&
               y - tetromino.y < tetromino.shape.length &&
               x - tetromino.x >= 0 &&
-              x - tetromino.x < tetromino.shape[0].length;
+              x - tetromino.x < tetromino.shape[0].length
             const isShadowInRange =
               y - shadow.y >= 0 &&
               y - shadow.y < shadow.shape.length &&
               x - shadow.x >= 0 &&
-              x - shadow.x < shadow.shape[0].length;
+              x - shadow.x < shadow.shape[0].length
             const isTetromino =
               isTetrominoInRange &&
-              tetromino.shape[y - tetromino.y][x - tetromino.x] > 0;
+              tetromino.shape[y - tetromino.y][x - tetromino.x] > 0
             const isShadow =
-              isShadowInRange &&
-              shadow.shape[y - shadow.y][x - shadow.x] === -2;
+              isShadowInRange && shadow.shape[y - shadow.y][x - shadow.x] === -2
             return (
               <div
                 key={`${x}-${y}`}
@@ -75,17 +69,17 @@ export default function FakeGameBoard({
                       : n > 0
                       ? tetrominoColors[n - 1]
                       : n === -2
-                      ? "#ccc"
-                      : "",
-                  opacity: isShadow && !isTetromino ? ".35" : "",
+                      ? '#ccc'
+                      : '',
+                  opacity: isShadow && !isTetromino ? '.35' : '',
                   width: `${size}px`,
                   height: `${size}px`,
                 }}
               ></div>
-            );
+            )
           })
         )}
-        {gameMode === "multi" ? (
+        {gameMode === 'multi' ? (
           <GarbageGauge lineCount={pendingGarbageLineCount || 0} />
         ) : null}
         <GameboardOverlay>
@@ -98,5 +92,5 @@ export default function FakeGameBoard({
       </div>
       <UpcomingPieces seeds={seeds} />
     </div>
-  );
+  )
 }

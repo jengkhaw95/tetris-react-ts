@@ -1,71 +1,71 @@
-import express from "express";
-import WebSocket from "ws";
-import {uuid} from "../utils";
-import {MAX_PLAYER_PER_ROOM} from "../src/lib/config";
+import express from 'express'
+import WebSocket from 'ws'
+import { uuid } from '../utils'
+import { MAX_PLAYER_PER_ROOM } from '../src/lib/config'
 
-type ClientIdType = string;
+type ClientIdType = string
 
-type RoomIdType = string;
+type RoomIdType = string
 
 interface GameState {
-  startTimestamp: null | number;
-  players: Set<ClientIdType>;
-  readyState: Set<ClientIdType>;
-  losers: Array<ClientIdType>;
-  winner?: ClientIdType;
-  isGameOver: false;
+  startTimestamp: null | number
+  players: Set<ClientIdType>
+  readyState: Set<ClientIdType>
+  losers: Array<ClientIdType>
+  winner?: ClientIdType
+  isGameOver: false
 }
 
-const app = express();
+const app = express()
 
 const server = app.listen(3000, () => {
-  console.log("Server started on port 3000");
-});
+  console.log('Server started on port 3000')
+})
 
-const wss = new WebSocket.Server({server});
+const wss = new WebSocket.Server({ server })
 
-const wsClients: Map<ClientIdType, WebSocket> = new Map();
-const clientRoomMap: Map<ClientIdType, RoomIdType> = new Map();
-const gameState: Map<RoomIdType, GameState> = new Map();
+const wsClients: Map<ClientIdType, WebSocket> = new Map()
+const clientRoomMap: Map<ClientIdType, RoomIdType> = new Map()
+const gameState: Map<RoomIdType, GameState> = new Map()
 
 function broadcastToRoom(
   roomId: RoomIdType,
   msg: any,
   skippingClientIds?: string | string[]
 ) {
-  const gs = gameState.get(roomId);
+  const gs = gameState.get(roomId)
   if (!gs) {
-    return;
+    return
   }
   const skip = skippingClientIds
     ? Array.isArray(skippingClientIds)
       ? skippingClientIds
       : [skippingClientIds]
-    : [];
-  const {players} = gs;
+    : []
+  const { players } = gs
   for (let clientId of players) {
     if (skip.includes(clientId)) {
-      continue;
+      continue
     }
-    const ws = wsClients.get(clientId);
+    const ws = wsClients.get(clientId)
     if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({...msg, clientId}));
+      ws.send(JSON.stringify({ ...msg, clientId }))
     }
   }
 }
 
 function sendInitRoomState(roomId: string, clientId: string) {
-  const ws = wsClients.get(clientId);
+  const ws = wsClients.get(clientId)
   if (!ws) {
-    return;
+    return
   }
-  const gs = gameState.get(roomId);
+  const gs = gameState.get(roomId)
   if (!gs) {
-    return;
+    return
   }
   ws.send(
     JSON.stringify({
-      type: "INIT",
+      type: 'INIT',
       roomId,
       clientId,
       totalPlayer: gameState.get(roomId)!.players.size,
@@ -73,17 +73,17 @@ function sendInitRoomState(roomId: string, clientId: string) {
       startTimestamp: gs.startTimestamp,
       isGameOver: gs.isGameOver,
     })
-  );
+  )
 }
 
 function broadcastRoomState(
   roomId: RoomIdType,
-  eventType: "READY_STATE_CHANGE" | "PLAYER_JOIN" | "GAME_END",
+  eventType: 'READY_STATE_CHANGE' | 'PLAYER_JOIN' | 'GAME_END',
   skippingClientIds?: string | string[]
 ) {
-  const gs = gameState.get(roomId);
+  const gs = gameState.get(roomId)
   if (!gs) {
-    return;
+    return
   }
   broadcastToRoom(
     roomId,
@@ -97,28 +97,28 @@ function broadcastRoomState(
       losers: gs.losers,
     },
     skippingClientIds
-  );
+  )
 }
 
-wss.on("connection", (ws, req) => {
-  console.log("Client connected");
+wss.on('connection', (ws, req) => {
+  console.log('Client connected')
   if (!req.url) {
-    ws.close();
-    return;
+    ws.close()
+    return
   }
-  const url = new URL(req.url, `http://${req.headers.host}`);
-  const roomId = url.searchParams.get("room")?.toLowerCase();
-  const clientId = uuid();
+  const url = new URL(req.url, `http://${req.headers.host}`)
+  const roomId = url.searchParams.get('room')?.toLowerCase()
+  const clientId = uuid()
 
   if (!roomId) {
-    ws.close();
-    return;
+    ws.close()
+    return
   }
-  console.log(`Client ${clientId} request to join room ${roomId}`);
+  console.log(`Client ${clientId} request to join room ${roomId}`)
 
-  wsClients.set(clientId, ws);
-  clientRoomMap.set(clientId, roomId);
-  const gameRoom = gameState.get(roomId);
+  wsClients.set(clientId, ws)
+  clientRoomMap.set(clientId, roomId)
+  const gameRoom = gameState.get(roomId)
   if (!gameRoom) {
     gameState.set(roomId, {
       startTimestamp: null,
@@ -126,172 +126,172 @@ wss.on("connection", (ws, req) => {
       readyState: new Set([]),
       isGameOver: false,
       losers: [],
-    });
+    })
   } else {
     if (gameRoom.startTimestamp) {
-      console.log("Cannot join, the game has started");
-      ws.send(JSON.stringify({type: "REJECT"}));
-      ws.close();
-      return;
+      console.log('Cannot join, the game has started')
+      ws.send(JSON.stringify({ type: 'REJECT' }))
+      ws.close()
+      return
     }
 
     if (gameRoom.players.size >= MAX_PLAYER_PER_ROOM) {
-      ws.send(JSON.stringify({type: "REJECT"}));
-      ws.close();
-      return;
+      ws.send(JSON.stringify({ type: 'REJECT' }))
+      ws.close()
+      return
     }
-    gameRoom.players.add(clientId);
+    gameRoom.players.add(clientId)
   }
 
-  sendInitRoomState(roomId, clientId);
-  broadcastRoomState(roomId, "PLAYER_JOIN", clientId);
+  sendInitRoomState(roomId, clientId)
+  broadcastRoomState(roomId, 'PLAYER_JOIN', clientId)
 
-  ws.on("message", (message: string) => {
-    const msg = JSON.parse(message);
+  ws.on('message', (message: string) => {
+    const msg = JSON.parse(message)
     switch (msg.type) {
-      case "READY_STATE_CHANGE": {
-        const {clientId, roomId, isReady} = msg;
+      case 'READY_STATE_CHANGE': {
+        const { clientId, roomId, isReady } = msg
         // Check is client in the room
         if (clientRoomMap.get(clientId) !== roomId) {
           // Client is not in the room
-          console.log("NOT ROOM ID");
-          return;
+          console.log('NOT ROOM ID')
+          return
         }
 
         // Logic
         // If game is staring, no ready state change.
-        const gs = gameState.get(roomId);
+        const gs = gameState.get(roomId)
         if (!gs) {
           // Game state not found
-          console.log("NO ROOM");
-          return;
+          console.log('NO ROOM')
+          return
         }
-        const isGameHasStarted = gs.startTimestamp;
+        const isGameHasStarted = gs.startTimestamp
         if (isGameHasStarted) {
           // Game has started
-          console.log("GAME STARTED");
-          return;
+          console.log('GAME STARTED')
+          return
         }
         // If readyState size === player size, set startingTimestamp
         if (isReady) {
-          gs.readyState.add(clientId);
+          gs.readyState.add(clientId)
         } else {
-          gs.readyState.delete(clientId);
+          gs.readyState.delete(clientId)
         }
         // Broadcast ready state
-        broadcastRoomState(roomId, "READY_STATE_CHANGE");
+        broadcastRoomState(roomId, 'READY_STATE_CHANGE')
 
         if (gs.readyState.size === gs.players.size) {
-          gs.startTimestamp = Date.now() + 6_000;
+          gs.startTimestamp = Date.now() + 6_000
           // Game started
           broadcastToRoom(roomId, {
             roomId,
-            type: "GAME_START",
+            type: 'GAME_START',
             startTimestamp: gs.startTimestamp,
             playerIds: [...gs.players],
-          });
+          })
         }
 
-        break;
+        break
       }
 
-      case "GAME_SNAPSHOT": {
-        const {snapshot, clientId, roomId} = msg;
+      case 'GAME_SNAPSHOT': {
+        const { snapshot, clientId, roomId } = msg
 
         broadcastToRoom(
           roomId,
-          {type: "GAME_SNAPSHOT", snapshot, playerId: clientId},
+          { type: 'GAME_SNAPSHOT', snapshot, playerId: clientId },
           clientId
-        );
+        )
 
-        break;
+        break
       }
 
-      case "GAME_OVER": {
-        const {roomId, clientId, timestamp} = msg;
+      case 'GAME_OVER': {
+        const { roomId, clientId, timestamp } = msg
 
-        const gs = gameState.get(roomId);
+        const gs = gameState.get(roomId)
         if (!gs) {
-          return;
+          return
         }
-        gs.losers.push(clientId);
+        gs.losers.push(clientId)
 
-        broadcastRoomState(roomId, "READY_STATE_CHANGE");
+        broadcastRoomState(roomId, 'READY_STATE_CHANGE')
 
         // Check if game ends
         if (gs.losers.length >= gs.players.size - 1) {
-          gs.winner = clientId;
-          broadcastRoomState(roomId, "GAME_END");
+          gs.winner = clientId
+          broadcastRoomState(roomId, 'GAME_END')
 
           // Clean up room
-          [...gs.players].forEach((playerId) => {
-            wsClients.get(playerId)?.close();
-            clientRoomMap.delete(playerId);
-          });
-          gameState.delete(roomId);
+          ;[...gs.players].forEach((playerId) => {
+            wsClients.get(playerId)?.close()
+            clientRoomMap.delete(playerId)
+          })
+          gameState.delete(roomId)
           // Close room
-          return;
+          return
         }
 
-        break;
+        break
       }
-      case "ATTACK": {
-        const {roomId, clientId, target, lineCount} = msg;
-        console.log(`Player ${clientId} attacking ${target} with ${lineCount}`);
-        const gs = gameState.get(roomId);
+      case 'ATTACK': {
+        const { roomId, clientId, target, lineCount } = msg
+        console.log(`Player ${clientId} attacking ${target} with ${lineCount}`)
+        const gs = gameState.get(roomId)
         if (!gs) {
-          return;
+          return
         }
-        gs.losers.push(clientId);
-        const targetWs = wsClients.get(target);
+        gs.losers.push(clientId)
+        const targetWs = wsClients.get(target)
         if (!targetWs) {
-          return;
+          return
         }
 
         if (!lineCount) {
-          return;
+          return
         }
 
         targetWs.send(
           JSON.stringify({
-            type: "ATTACKED",
+            type: 'ATTACKED',
             lineCount,
             playerId: clientId,
           })
-        );
+        )
 
-        break;
+        break
       }
 
       default:
-        break;
+        break
     }
-  });
+  })
 
-  ws.on("open", (message: string) => {
-    console.log("open", message);
-  });
+  ws.on('open', (message: string) => {
+    console.log('open', message)
+  })
 
-  ws.on("close", () => {
+  ws.on('close', () => {
     // If is room, notify other players
 
-    wsClients.delete(clientId);
-    const clientRoom = clientRoomMap.get(clientId);
+    wsClients.delete(clientId)
+    const clientRoom = clientRoomMap.get(clientId)
     if (clientRoom) {
-      const gameRoom = gameState.get(clientRoom);
+      const gameRoom = gameState.get(clientRoom)
       if (gameRoom) {
-        broadcastToRoom(clientRoom, {type: "PLAYER_LEFT", playerId: clientId});
-        gameRoom.players.delete(clientId);
-        gameRoom.readyState.clear();
-        broadcastRoomState(clientRoom, "READY_STATE_CHANGE");
+        broadcastToRoom(clientRoom, { type: 'PLAYER_LEFT', playerId: clientId })
+        gameRoom.players.delete(clientId)
+        gameRoom.readyState.clear()
+        broadcastRoomState(clientRoom, 'READY_STATE_CHANGE')
 
         // Clean room when all players left
         if (!gameRoom.players.size) {
-          gameState.delete(clientRoom);
+          gameState.delete(clientRoom)
         }
       }
     }
-    clientRoomMap.delete(clientId);
-    console.log("Client disconnected");
-  });
-});
+    clientRoomMap.delete(clientId)
+    console.log('Client disconnected')
+  })
+})

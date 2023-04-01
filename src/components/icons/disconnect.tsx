@@ -1,11 +1,11 @@
-import React from "react";
+import React from 'react'
 
 export default function IconDisconnect({
   className,
   size,
 }: {
-  className?: string;
-  size?: number;
+  className?: string
+  size?: number
 }) {
   return (
     <svg
@@ -30,5 +30,5 @@ export default function IconDisconnect({
       <path d="M13 14l-2 2"></path>
       <path d="M16 16l4 4"></path>
     </svg>
-  );
+  )
 }

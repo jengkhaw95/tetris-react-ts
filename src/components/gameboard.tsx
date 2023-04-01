@@ -1,16 +1,16 @@
-import React, {PropsWithChildren} from "react";
-import {cellSize, tetrominoColors} from "../lib/config";
-import {useTetrisEngine} from "../lib/engine";
-import GarbageGauge from "./garbage-gauge";
-import SwapPiece from "./swap-piece";
-import UpcomingPieces from "./upcoming-pieces";
+import React, { PropsWithChildren } from 'react'
+import { cellSize, tetrominoColors } from '../lib/config'
+import { useTetrisEngine } from '../lib/engine'
+import GarbageGauge from './garbage-gauge'
+import SwapPiece from './swap-piece'
+import UpcomingPieces from './upcoming-pieces'
 
 interface GameBoardProps {
-  data: ReturnType<typeof useTetrisEngine>;
-  timer?: number;
+  data: ReturnType<typeof useTetrisEngine>
+  timer?: number
 }
 
-export default function Gameboard({data, timer}: GameBoardProps) {
+export default function Gameboard({ data, timer }: GameBoardProps) {
   const {
     gameMode,
     map,
@@ -20,7 +20,7 @@ export default function Gameboard({data, timer}: GameBoardProps) {
     swap,
     combo,
     garbageLineCount,
-  } = data;
+  } = data
 
   return (
     <div className="flex gap-4 justify-center mx-auto">
@@ -32,18 +32,17 @@ export default function Gameboard({data, timer}: GameBoardProps) {
               y - tetromino.y >= 0 &&
               y - tetromino.y < tetromino.shape.length &&
               x - tetromino.x >= 0 &&
-              x - tetromino.x < tetromino.shape[0].length;
+              x - tetromino.x < tetromino.shape[0].length
             const isShadowInRange =
               y - shadow.y >= 0 &&
               y - shadow.y < shadow.shape.length &&
               x - shadow.x >= 0 &&
-              x - shadow.x < shadow.shape[0].length;
+              x - shadow.x < shadow.shape[0].length
             const isTetromino =
               isTetrominoInRange &&
-              tetromino.shape[y - tetromino.y][x - tetromino.x] > 0;
+              tetromino.shape[y - tetromino.y][x - tetromino.x] > 0
             const isShadow =
-              isShadowInRange &&
-              shadow.shape[y - shadow.y][x - shadow.x] === -2;
+              isShadowInRange && shadow.shape[y - shadow.y][x - shadow.x] === -2
             return (
               <div
                 key={`${x}-${y}`}
@@ -55,17 +54,17 @@ export default function Gameboard({data, timer}: GameBoardProps) {
                       : n > 0
                       ? tetrominoColors[n - 1]
                       : n === -2
-                      ? "#ccc"
-                      : "",
-                  opacity: isShadow && !isTetromino ? ".35" : "",
+                      ? '#ccc'
+                      : '',
+                  opacity: isShadow && !isTetromino ? '.35' : '',
                   width: `${cellSize}px`,
                   height: `${cellSize}px`,
                 }}
               ></div>
-            );
+            )
           })
         )}
-        {gameMode === "multi" ? (
+        {gameMode === 'multi' ? (
           <GarbageGauge lineCount={garbageLineCount.current || 0} />
         ) : null}
         <GameboardOverlay>
@@ -78,15 +77,15 @@ export default function Gameboard({data, timer}: GameBoardProps) {
       </div>
       <UpcomingPieces seeds={seeds} />
     </div>
-  );
+  )
 }
 
 interface GameboardOverlayProps extends PropsWithChildren {}
 
-export function GameboardOverlay({children}: GameboardOverlayProps) {
+export function GameboardOverlay({ children }: GameboardOverlayProps) {
   return (
     <div className="absolute z-10 w-full h-full flex items-center justify-center">
       {children}
     </div>
-  );
+  )
 }

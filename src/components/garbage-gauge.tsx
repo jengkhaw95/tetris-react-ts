@@ -1,7 +1,7 @@
-import React from "react";
-import {yCount} from "../lib/config";
+import React from 'react'
+import { yCount } from '../lib/config'
 
-export default function GarbageGauge({lineCount}: {lineCount: number}) {
+export default function GarbageGauge({ lineCount }: { lineCount: number }) {
   return (
     <div className="absolute w-2 rounded-full h-full -left-4 border overflow-hidden flex items-end">
       <div
@@ -11,5 +11,5 @@ export default function GarbageGauge({lineCount}: {lineCount: number}) {
         }}
       ></div>
     </div>
-  );
+  )
 }

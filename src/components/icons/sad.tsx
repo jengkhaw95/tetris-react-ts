@@ -1,11 +1,11 @@
-import React from "react";
+import React from 'react'
 
 export default function IconSad({
   className,
   size,
 }: {
-  className?: string;
-  size?: number;
+  className?: string
+  size?: number
 }) {
   return (
     <svg
@@ -26,5 +26,5 @@ export default function IconSad({
       <path d="M15 10l.01 0"></path>
       <path d="M9.5 15.25a3.5 3.5 0 0 1 5 0"></path>
     </svg>
-  );
+  )
 }

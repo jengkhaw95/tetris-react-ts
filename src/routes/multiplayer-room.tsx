@@ -1,18 +1,18 @@
-import {useEffect, useRef, useState} from "react";
-import FakeGameBoard from "../components/fake-gameboard";
-import Gameboard from "../components/gameboard";
-import IconUser from "../components/icons/user";
+import { useEffect, useRef, useState } from 'react'
+import FakeGameBoard from '../components/fake-gameboard'
+import Gameboard from '../components/gameboard'
+import IconUser from '../components/icons/user'
 import {
   calculateGarbageLineCountByCombo,
   MAX_PLAYER_PER_ROOM,
   MIN_SNAPSHOT_INTERVAL,
-} from "../lib/config";
-import {EngineConnectorType, useTetrisEngine} from "../lib/engine";
-import {useWS} from "../lib/ws";
-import {GameSnapshot} from "../types";
+} from '../lib/config'
+import { EngineConnectorType, useTetrisEngine } from '../lib/engine'
+import { useWS } from '../lib/ws'
+import { GameSnapshot } from '../types'
 
 export default function MultiplayerRoom() {
-  const engineConnectorRef = useRef<EngineConnectorType>();
+  const engineConnectorRef = useRef<EngineConnectorType>()
   const {
     sendToServer,
     amIReady,
@@ -25,75 +25,75 @@ export default function MultiplayerRoom() {
     isGameOver,
     leftPlayers,
     losers,
-  } = useWS({engineConnector: engineConnectorRef});
+  } = useWS({ engineConnector: engineConnectorRef })
 
-  const timerRef = useRef<NodeJS.Timer>();
-  const lastSnapshotTimstamp = useRef<number>(0);
-  const [countDown, setCountDown] = useState<number>(0);
+  const timerRef = useRef<NodeJS.Timer>()
+  const lastSnapshotTimstamp = useRef<number>(0)
+  const [countDown, setCountDown] = useState<number>(0)
 
   const targetingPool = playerSnapshot.filter(
     (p) => !losers.includes(p.playerId) && p.playerId !== clientId
-  );
-  const targetingPlayerIndex = Math.abs(countDown) % targetingPool.length;
+  )
+  const targetingPlayerIndex = Math.abs(countDown) % targetingPool.length
 
   const handleSendSnapshotToServer = (snapshot: GameSnapshot) => {
-    const n = Date.now();
-    const interval = n - lastSnapshotTimstamp.current;
+    const n = Date.now()
+    const interval = n - lastSnapshotTimstamp.current
     if (interval > MIN_SNAPSHOT_INTERVAL) {
-      sendToServer({type: "GAME_SNAPSHOT", snapshot});
-      lastSnapshotTimstamp.current = n;
+      sendToServer({ type: 'GAME_SNAPSHOT', snapshot })
+      lastSnapshotTimstamp.current = n
     } else {
-      console.log(`Blocked snapshot sending: ${interval}ms`);
+      console.log(`Blocked snapshot sending: ${interval}ms`)
     }
-  };
+  }
 
   const handleComboCount = (combo: number) => {
-    const toSend = calculateGarbageLineCountByCombo(combo);
+    const toSend = calculateGarbageLineCountByCombo(combo)
     if (targetingPool.length < 1) {
-      return;
+      return
     }
-    const targetingPlayerId = targetingPool[targetingPlayerIndex]?.playerId;
+    const targetingPlayerId = targetingPool[targetingPlayerIndex]?.playerId
     if (!targetingPlayerId) {
-      return;
+      return
     }
-    console.log(`Attacking ${combo}`);
+    console.log(`Attacking ${combo}`)
     sendToServer({
-      type: "ATTACK",
+      type: 'ATTACK',
       lineCount: toSend,
       target: targetingPlayerId,
-    });
-  };
+    })
+  }
 
   const gameBoardData = useTetrisEngine({
-    gameMode: "multi",
+    gameMode: 'multi',
     engineConnector: engineConnectorRef,
     isPaused: !gameStartTimestamp || countDown > 0 || isGameOver,
     isGameOver: isGameOver,
-    onGameOver: (timestamp) => sendToServer({type: "GAME_OVER", timestamp}),
+    onGameOver: (timestamp) => sendToServer({ type: 'GAME_OVER', timestamp }),
     onSnapshot: handleSendSnapshotToServer,
     onLineClear: handleComboCount,
-  });
+  })
 
   // Start counting down when all players are ready (gameStartTimestamp is set)
   useEffect(() => {
     if (isGameOver) {
-      clearInterval(timerRef.current);
-      setCountDown(0);
+      clearInterval(timerRef.current)
+      setCountDown(0)
     } else if (gameStartTimestamp) {
       timerRef.current = setInterval(() => {
-        const tts = gameStartTimestamp - Date.now();
+        const tts = gameStartTimestamp - Date.now()
         // Prevent stoping just to re-use count to target attacking player
         //if (tts < 0) {
         //  clearInterval(timerRef.current);
         //}
-        setCountDown(Math.ceil(tts / 1000));
-      }, 100);
+        setCountDown(Math.ceil(tts / 1000))
+      }, 100)
     }
 
     return () => {
-      clearInterval(timerRef.current);
-    };
-  }, [gameStartTimestamp]);
+      clearInterval(timerRef.current)
+    }
+  }, [gameStartTimestamp])
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -106,7 +106,7 @@ export default function MultiplayerRoom() {
           <div className="grid gap-2 grid-cols-2">
             <Gameboard data={gameBoardData} timer={countDown} />
             <div className="flex items-center gap-6 justify-center">
-              {playerSnapshot.map(({snapshot, playerId}) => (
+              {playerSnapshot.map(({ snapshot, playerId }) => (
                 <FakeGameBoard
                   timer={countDown}
                   key={playerId}
@@ -128,18 +128,18 @@ export default function MultiplayerRoom() {
         />
       )}
     </div>
-  );
+  )
 }
 
 interface WaitingZoneProps {
-  totalPlayer: number;
-  readyPlayers: string[];
-  amIReady?: boolean;
-  gameStartTimestamp?: number;
+  totalPlayer: number
+  readyPlayers: string[]
+  amIReady?: boolean
+  gameStartTimestamp?: number
   onReadyStateChanged: (data: {
-    type: "READY_STATE_CHANGE";
-    isReady: boolean;
-  }) => void;
+    type: 'READY_STATE_CHANGE'
+    isReady: boolean
+  }) => void
 }
 
 function WaitingZone({
@@ -157,10 +157,10 @@ function WaitingZone({
             key={i}
             className={`drop-shadow ${
               i < readyPlayers.length
-                ? "text-teal-500"
+                ? 'text-teal-500'
                 : i < totalPlayer
-                ? "text-slate-500"
-                : "text-slate-300"
+                ? 'text-slate-500'
+                : 'text-slate-300'
             }`}
             size={40}
           />
@@ -169,22 +169,25 @@ function WaitingZone({
 
       <button
         className={`rounded text-sm text-white px-4 py-2 disabled:bg-gray-200 ${
-          amIReady ? "bg-red-500" : "bg-teal-500"
+          amIReady ? 'bg-red-500' : 'bg-teal-500'
         }`}
         disabled={!!gameStartTimestamp || totalPlayer <= 1}
         onClick={() => {
           if (gameStartTimestamp || totalPlayer <= 1) {
-            return;
+            return
           }
-          onReadyStateChanged({type: "READY_STATE_CHANGE", isReady: !amIReady});
+          onReadyStateChanged({
+            type: 'READY_STATE_CHANGE',
+            isReady: !amIReady,
+          })
         }}
       >
         {gameStartTimestamp
-          ? "Game is starting..."
+          ? 'Game is starting...'
           : amIReady
-          ? "Cancel"
-          : "Ready"}
+          ? 'Cancel'
+          : 'Ready'}
       </button>
     </div>
-  );
+  )
 }

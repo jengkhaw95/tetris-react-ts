@@ -1,10 +1,10 @@
-import {Link, useNavigate} from "react-router-dom";
-import {uuid} from "../../utils";
-import IconMultiUser from "../components/icons/multi-user";
-import IconUser from "../components/icons/user";
+import { Link, useNavigate } from 'react-router-dom'
+import { uuid } from '../../utils'
+import IconMultiUser from '../components/icons/multi-user'
+import IconUser from '../components/icons/user'
 
 export default function Home() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   return (
     <div className="flex flex-col md:flex-row items-center gap-12 md:justify-center">
       <Link
@@ -16,7 +16,7 @@ export default function Home() {
       </Link>
       <button
         onClick={() => {
-          navigate(`/room/${uuid()}`);
+          navigate(`/room/${uuid()}`)
         }}
         className="px-6 rounded border shadow flex flex-col gap-6 items-center justify-center w-60 h-60"
       >
@@ -24,5 +24,5 @@ export default function Home() {
         <div className="text-xl text-center text-slate-500 ">Multi Player</div>
       </button>
     </div>
-  );
+  )
 }

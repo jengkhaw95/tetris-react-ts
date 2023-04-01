@@ -1,13 +1,13 @@
-import {minMax} from "./utils";
+import { minMax } from './utils'
 
-export const cellSize = 24;
-export const fakeCellSize = 12;
-export const PREVIEW_COUNT = 4;
-export const xCount = 10;
-export const yCount = 20;
-export const MIN_SNAPSHOT_INTERVAL = 50;
+export const cellSize = 24
+export const fakeCellSize = 12
+export const PREVIEW_COUNT = 4
+export const xCount = 10
+export const yCount = 20
+export const MIN_SNAPSHOT_INTERVAL = 50
 
-export const MAX_PLAYER_PER_ROOM = 4;
+export const MAX_PLAYER_PER_ROOM = 4
 
 //export const tetrominoColors = [
 //    "#f94144",
@@ -20,14 +20,14 @@ export const MAX_PLAYER_PER_ROOM = 4;
 //];
 
 export const tetrominoColors = [
-  "#4FC3F7", // Light blue
-  "#1976D2", // Blue
-  "#FFA726", // Orange
-  "#FFEB3B", // Yellow
-  "#66BB6A", // Green
-  "#F06292", // Pink
-  "#E53935", // Red
-];
+  '#4FC3F7', // Light blue
+  '#1976D2', // Blue
+  '#FFA726', // Orange
+  '#FFEB3B', // Yellow
+  '#66BB6A', // Green
+  '#F06292', // Pink
+  '#E53935', // Red
+]
 
 // Ref: https://tetris.fandom.com/wiki/SRS#Wall_Kicks
 export const SRS = [
@@ -139,7 +139,7 @@ export const SRS = [
       ],
     ],
   }, // J, L, T, S, Z
-];
+]
 
 export const tetrominoShapes: number[][][] = [
   // I-shape
@@ -184,9 +184,9 @@ export const tetrominoShapes: number[][][] = [
     [0, 7, 7],
     [0, 0, 0],
   ],
-];
+]
 
 // Ref: https://tetris.wiki/Combo
 export const calculateGarbageLineCountByCombo = (currentCombo: number) => {
-  return minMax(Math.ceil(currentCombo / 2), 0, 4);
-};
+  return minMax(Math.ceil(currentCombo / 2), 0, 4)
+}

@@ -1,15 +1,15 @@
-import {cellSize} from "../lib/config";
-import {generateTetromino} from "../lib/utils";
+import { cellSize } from '../lib/config'
+import { generateTetromino } from '../lib/utils'
 
 export default function Tetromino({
   index,
   size,
 }: {
-  index: number;
-  size?: number;
+  index: number
+  size?: number
 }) {
-  const tetromino = generateTetromino(index);
-  size = size || cellSize;
+  const tetromino = generateTetromino(index)
+  size = size || cellSize
   return (
     <div
       className="flex items-center justify-center"
@@ -29,7 +29,7 @@ export default function Tetromino({
             <div
               key={i}
               style={{
-                backgroundColor: n ? tetromino.color : "",
+                backgroundColor: n ? tetromino.color : '',
                 width: `${size}px`,
                 height: `${size}px`,
               }}
@@ -38,5 +38,5 @@ export default function Tetromino({
         )}
       </div>
     </div>
-  );
+  )
 }

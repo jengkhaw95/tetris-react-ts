@@ -1,6 +1,6 @@
-import {Link, Outlet, useNavigate} from "react-router-dom";
-import {Toaster} from "react-hot-toast";
-import {uuid} from "../utils";
+import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
+import { uuid } from '../utils'
 // import "./App.css";
 
 // function minMax(value: number, min: number, max: number) {
@@ -260,7 +260,7 @@ import {uuid} from "../utils";
 // }
 
 function App() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   return (
     <div className="w-screen min-h-screen relative">
       <div className="fixed top-0 min-h-12 py-3 bg-white shadow w-full">
@@ -274,7 +274,7 @@ function App() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => {
-                navigate(`/room/${uuid()}`);
+                navigate(`/room/${uuid()}`)
               }}
               className="text-sm rounded px-4 py-2 text-blue-600  hover:bg-blue-50"
             >
@@ -294,7 +294,7 @@ function App() {
       </div>
       <Toaster />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
