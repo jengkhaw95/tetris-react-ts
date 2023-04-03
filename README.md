@@ -1,4 +1,4 @@
-A practice on react rendering logic by creating a tetris games.
+Try out `react` rendering logic by creating a tetris games.
 
 ## Features
 
