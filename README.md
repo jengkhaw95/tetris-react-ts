@@ -1,9 +1,9 @@
-Try out `react` rendering logic by creating a tetris games.
+A tetris game created with `React`.
 
 ## Features
 
 - Basic keyboard controls, including `swapping`
-- Wallkick SRS implementation
+- Wallkick SRS implementation, also T-spin
 - Multiplayer battle
 
 ## Todo
@@ -14,6 +14,7 @@ Try out `react` rendering logic by creating a tetris games.
 - [ ] Multiplayer UI Layout
 - [ ] Custom username for multiplayer
 - [ ] Keep track of line clear per sec, max combo, total line clear
+- [ ] T-spin/perfect clear as bonus combo
 
 ### Server
 
