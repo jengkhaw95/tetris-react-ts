@@ -105,7 +105,7 @@ export default function MultiplayerRoom() {
         <div>Client ID: {clientId}</div>
         <div>Room ID: {roomId}</div>
       </div>
-      {gameStartTimestamp ? null : (
+      {!gameStartTimestamp && !!roomId ? (
         <button
           className="flex items-center gap-2 px-2 py-1 text-xs font-semibold rounded bg-slate-100 w-max hover:text-white group hover:bg-gradient-to-r hover:from-[#E53935] hover:to-[#FFA726] hover:shadow"
           onClick={() => {
@@ -119,7 +119,7 @@ export default function MultiplayerRoom() {
           />
           <div>Invite link</div>
         </button>
-      )}
+      ) : null}
       {gameStartTimestamp ? (
         <div className="space-y-6">
           <div className="grid gap-2 grid-cols-2">
