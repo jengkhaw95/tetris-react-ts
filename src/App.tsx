@@ -269,7 +269,7 @@ function App() {
             to="/"
             className="text-lg font-extrabold uppercase text-transparent bg-clip-text bg-gradient-to-r from-[#E53935] to-[#FFA726]"
           >
-            Tetris React TS
+            Tetris Game
           </Link>
           <div className="flex items-center gap-3">
             <button
