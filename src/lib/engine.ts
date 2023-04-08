@@ -216,7 +216,6 @@ export const useTetrisEngine = ({
           setSwap(seeds[0])
           nextTetromino()
         } else {
-          console.log(`${seeds[0]} in ${swap} out`)
           setSwap(seeds[0])
           setSeeds((s) => {
             const [_, ...k] = s
