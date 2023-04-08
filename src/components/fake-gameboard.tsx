@@ -1,5 +1,6 @@
 import React from 'react'
-import { cellSize, tetrominoColors, xCount, yCount } from '../lib/config'
+import { useGlobalContext } from '../context'
+import { tetrominoColors, xCount, yCount } from '../lib/config'
 import { GameSnapshot } from '../types'
 import { GameboardOverlay } from './gameboard'
 import GarbageGauge from './garbage-gauge'
@@ -21,6 +22,8 @@ export default function FakeGameBoard({
   gameMode,
   timer,
 }: FakeGameBoardProps) {
+  const { cellSize } = useGlobalContext()
+
   size = size || cellSize
   gameMode = gameMode || 'default'
   if (!data) {

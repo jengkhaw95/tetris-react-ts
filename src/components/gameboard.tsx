@@ -1,5 +1,6 @@
-import React, { PropsWithChildren } from 'react'
-import { cellSize, tetrominoColors } from '../lib/config'
+import React, { PropsWithChildren, useEffect } from 'react'
+import { useGlobalContext } from '../context'
+import { tetrominoColors } from '../lib/config'
 import { useTetrisEngine } from '../lib/engine'
 import GarbageGauge from './garbage-gauge'
 import SwapPiece from './swap-piece'
@@ -11,6 +12,7 @@ interface GameBoardProps {
 }
 
 export default function Gameboard({ data, timer }: GameBoardProps) {
+  const { cellSize } = useGlobalContext()
   const {
     gameMode,
     map,
@@ -22,6 +24,17 @@ export default function Gameboard({ data, timer }: GameBoardProps) {
     garbageLineCount,
     customDrawMap,
   } = data
+
+  useEffect(() => {
+    const handleTouchStart = () => {
+      console.log('NO ARROW KEY')
+      //setHasArrowKeys(false);
+    }
+    window.addEventListener('touchstart', handleTouchStart)
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart)
+    }
+  }, [])
 
   return (
     <div className="flex gap-4 justify-center mx-auto">

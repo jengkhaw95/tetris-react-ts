@@ -1,4 +1,4 @@
-import { cellSize } from '../lib/config'
+import { useGlobalContext } from '../context'
 import { generateTetromino } from '../lib/utils'
 
 export default function Tetromino({
@@ -8,6 +8,7 @@ export default function Tetromino({
   index: number | null
   size?: number
 }) {
+  const { cellSize } = useGlobalContext()
   size = size || cellSize
   if (index === null) {
     return (

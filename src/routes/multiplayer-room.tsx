@@ -110,7 +110,7 @@ export default function MultiplayerRoom() {
           className="flex items-center gap-2 px-2 py-1 text-xs font-semibold rounded bg-slate-100 w-max hover:text-white group hover:bg-gradient-to-r hover:from-[#E53935] hover:to-[#FFA726] hover:shadow"
           onClick={() => {
             navigator.clipboard.writeText(copyUrl)
-            toast.success('Copied to clipboard')
+            toast.success('Invitation link copied')
           }}
         >
           <IconCopy

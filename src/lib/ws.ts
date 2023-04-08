@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast'
 import { GameSnapshot } from '../types'
 import { EngineConnectorType } from './engine'
 
-const WS_URL = 'ws://localhost:3000'
+const WS_URL = 'ws://192.168.100.10:3030'
 
 export const useWS = ({
   engineConnector,
