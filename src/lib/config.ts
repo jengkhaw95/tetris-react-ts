@@ -1,6 +1,6 @@
 import { minMax } from './utils'
 
-export const cellSize = 10
+//export const cellSize = 10 // DEPRECATED
 export const fakeCellSize = 12
 export const PREVIEW_COUNT = 4
 export const xCount = 10
