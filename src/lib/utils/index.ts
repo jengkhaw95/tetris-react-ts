@@ -232,7 +232,7 @@ export function solidate(
   map: number[][],
   isShadow?: boolean
 ): [number[][], number] {
-  const { x, y, shape } = tetromino
+  const { x, y, shape, key } = tetromino
   const newMap = structuredClone(map) as number[][]
 
   for (let j in shape) {
@@ -260,6 +260,29 @@ export function solidate(
   for (let i of removingIndex) {
     newMap.splice(i, 1)
     newMap.unshift(Array(xCount).fill(0))
+  }
+
+  if (key === 5) {
+    const maxMapY = map.length - 1
+    const maxMapX = map[0].length - 1
+    // T shape
+    let cornerFilledCount = 0
+    if (map[y][x] !== 0) {
+      cornerFilledCount++
+    }
+    if (x + 2 > maxMapX || map[y][x + 2] !== 0) {
+      cornerFilledCount++
+    }
+    if (y + 2 > maxMapY || map[y + 2][x] !== 0) {
+      cornerFilledCount++
+    }
+    if (y + 2 > maxMapY || x + 2 > maxMapX || map[y + 2][x + 2] !== 0) {
+      cornerFilledCount++
+    }
+
+    if (cornerFilledCount >= 3) {
+      console.log('T-SPIN!!')
+    }
   }
 
   return [newMap, removingIndex.length]
